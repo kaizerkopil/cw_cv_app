@@ -15,7 +15,8 @@
     "browser-sync": "^3.0.2",
     "express": "^4.19.2",
     "nodemon": "^3.1.0",
-    "sequelize": "^6.37.3"
+    "sequelize": "^6.37.3",
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "body-parser": "^1.20.2",
