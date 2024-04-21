@@ -1,0 +1,12 @@
+// link to source: https://getbootstrap.com/docs/5.0/customize/sass/
+
+//main.scss
+// Option A: Include all of Bootstrap
+
+// 1. Include any default variable overrides here
+
+// 2. Include remainder of required Bootstrap stylesheets
+//$primary: red;
+@import '../../node_modules/bootstrap/scss/bootstrap.scss'
+
+// 3. Then add additional custom code here
