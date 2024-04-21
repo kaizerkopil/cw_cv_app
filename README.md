@@ -2,10 +2,11 @@
 
 ---
 
-!!! note University Information
-    Assignment: **Group Project (Coursework 2)**
-    Module Code & Title: **Software Quality Engineering CI7260**
-    University: **Kingston University London**
+## University Information
+
+Assignment: **Group Project (Coursework 2)**
+Module Code & Title: **Software Quality Engineering CI7260**
+University: **Kingston University London**
 
 ---
 
