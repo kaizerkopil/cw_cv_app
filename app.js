@@ -8,10 +8,10 @@ const app = express();
 custom_bs.initialiseBrowserSync();
 
 //#region Adding static files to app
-app.use("/css", express.static('./public/css/'));
-app.use("/js", express.static('./public/js/'));
-app.use("/bootstrap/js", express.static('./node_modules/bootstrap/dist/js/'));
+app.use("/css", express.static('./public/css'));
+app.use("/js", express.static('./public/js'));
 app.use("/img", express.static('./public/img'));
+app.use("/bootstrap", express.static('./node_modules/bootstrap/dist'));
 //#endregion
 
 //#region Configuring the app routes
