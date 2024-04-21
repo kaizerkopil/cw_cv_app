@@ -1,7 +1,5 @@
 # CV APP Documentation
 
----
-
 ## University Information
 
 - Assignment: **Group Project (Coursework 2)**
