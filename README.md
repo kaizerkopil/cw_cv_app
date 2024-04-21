@@ -26,12 +26,14 @@ Haider Asif : [input ur KNumber here]
 
   - **express** : _server-side application_
   - **nodemon** : _to automate execute of node code reflect on console_
-  - **browser-sync** : _to sync changes from any file reflect on the running server_
+  - **browser-sync** : _used to run the client-side on the server to be used across different devices on the same network which is very helpful in development phrase to test website app across multiple platforms_ 
+  - **parcel-bunder** : _handles the bundling of all the client-side file_
+  - **concurrently** : _offers functionality to run two npm script concurrently_
   - **ejs** (Embedded JavaScript) : _front-end layout_
   - **bootstrap v5.3.3** : _front-end framewor_
   - **sequelize** : _object relational mapper for node project_
   - **sqlite3** : _sql database_
-  - **Jest** : _testing framework_
+  - **Jest** : _testing framework to conduct unit tests on the back-end_
 
 ---
 
