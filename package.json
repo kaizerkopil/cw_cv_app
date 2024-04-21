@@ -4,8 +4,11 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js"
+    "test": "jest",
+    "start": "concurrently \"npm:watch-server\" \"npm:watch-client\"",
+    "watch-server": "nodemon app.js",
+    "watch-client": "parcel serve ./views/index.html",
+    "build": "parcel build ./views/index.html"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +23,9 @@
   },
   "devDependencies": {
     "body-parser": "^1.20.2",
-    "cypress": "^13.7.3"
+    "concurrently": "^8.2.2",
+    "cypress": "^13.7.3",
+    "jest": "^29.7.0",
+    "parcel-bundler": "^1.12.5"
   }
 }

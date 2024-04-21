@@ -1,0 +1,15 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    background-color: white;
+}
+
+#headerOne{
+    background-color: purple;
+}
+
+/*# sourceMappingURL=/base.3d3acea0.css.map */
