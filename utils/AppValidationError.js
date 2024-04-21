@@ -1,18 +1,17 @@
-class ValidationError extends Error{
+class AppValidationError extends Error{
     constructor(message){
         super(message);
-        this.name = "ValidationError";
+        this.name = "AppValidationError";
     }
 }
 
 function validateName(name){
     if(name == null || name.trim().length == 0){
-        throw new ValidationError("Invalid name");
+        throw new AppValidationError("Invalid name");
     }
 }
 
 module.exports = {
     validateName,
+    AppValidationError
 }
-
-export { validateName }
