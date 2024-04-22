@@ -21,10 +21,13 @@ describe('registerAnimal', () =>{
     });
 
     test('throws AppValidationError if the location is empty', () => {
+
+        //Arrange
         let name = "valid_name_passed";
         let location = "";
+
+        //Act and Assert
         expect(() => animal.registerAnimal(name, location)).toThrow(error.AppValidationError);
         expect(() => animal.registerAnimal(name, location)).toThrow("Invalid location");
-
     });
 })

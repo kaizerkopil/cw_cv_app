@@ -1,0 +1,1 @@
+{"mappings":"AAAA;;;;;;AAMA;;;;AAIA","sources":["public/css/base.css"],"sourcesContent":["*{\r\n    margin: 0;\r\n    padding: 0;\r\n    box-sizing: border-box;\r\n}\r\n\r\nbody{\r\n    background-color: white;\r\n}\r\n\r\n#headerOne{\r\n    background-color: purple;\r\n}"],"names":[],"version":3,"file":"index.a4aa4089.css.map","sourceRoot":"/__parcel_source_root/"}
