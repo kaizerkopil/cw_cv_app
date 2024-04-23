@@ -2,10 +2,11 @@ const bs = require("browser-sync");
 
 exports.initialiseBrowserSync = () => {
   bs.init({
-    proxy: "localhost:1234",
-    port: 5000,
+    proxy: "localhost:5050",
+    port : 3333,
     files: [
-        "./dist"
+        "./views/**/*.ejs",
+        "./public/**/*.{css,js}"
     ],
     watchOptions: {
       ignored: "./node_modules",

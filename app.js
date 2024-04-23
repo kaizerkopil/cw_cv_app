@@ -8,17 +8,47 @@ const app = express();
 custom_bs.initialiseBrowserSync();
 
 //#region Adding static files to app
-// app.use("/css", express.static('./public/css'));
-// app.use("/js", express.static('./public/js'));
-// app.use("/img", express.static('./public/img'));
-// app.use("/bootstrap", express.static('./node_modules/bootstrap/dist'));
-// app.use("/utils", express.static('./utils'))
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use("/css", express.static('./public/css'));
+app.use("/js", express.static('./public/js'));
+app.use("/img", express.static('./public/img'));
+app.use("/bootstrap", express.static('./node_modules/bootstrap/dist'));
+app.use("/utils", express.static('./utils'))
 //#endregion
 
+//setting the view engine
+app.set('view engine', 'ejs');
+
 //#region Configuring the app routes
+
+//home page route
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'index.html'));
+    res.render('home', req.query);
+});
+
+//getJobSeekers
+app.get('/getJobSeekers', (req, res) => {
+    let jobseekers = ["Stareo Mark", "Marshal Jorun", "Marko Patel", "Nisha Stuash"]
+    res.render('getJobSeekers', { items: jobseekers }, (error, ejsPage) => {
+            if(error){
+                console.log(`The error thrown by page : ${error.message}`);
+                res.status(500).send('An error occurred');
+            }else{
+                res.send(ejsPage)
+            }
+    });
+});
+
+//showJobPosts for jobSeekers
+app.get('/getJobPosts', (req, res) => {
+    let jobs = ["job1", "job2", "job3", "job4"]
+    res.render('getJobPosts', { items: jobs }, (error, ejsPage) => {
+            if(error){
+                console.log(`The error thrown by page : ${error.message}`);
+                res.status(500).send('An error occurred');
+            }else{
+                res.send(ejsPage)
+            }
+    });
 });
 //#endregion
 

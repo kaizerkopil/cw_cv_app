@@ -1,0 +1,13 @@
+<%- include('./layouts/header') %>
+<main>
+  <div class="container mt-2">
+    <h2 class="h2">All the available Job Posts:</h2>
+      <ul>
+        <% for(i = 0; i < items.length; i++){%>
+          <li><%= items[i] %></li>
+        <%}%>
+      </ul>
+    <h5>hello</h5>
+  </div>
+</main>
+<%- include('./layouts/footer') %>
