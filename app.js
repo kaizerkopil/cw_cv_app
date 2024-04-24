@@ -6,7 +6,8 @@ const custom_bs = require("./utils/browserSync");
 
 const app = express();
 custom_bs.initialiseBrowserSync();
-
+//express.urlencoded middleware to parse URL-encoded bodies (from form submissions):
+app.use(express.urlencoded({ extended: true }));
 //#region Adding static files to app
 app.use("/css", express.static("./public/css"));
 app.use("/js", express.static("./public/js"));
@@ -59,6 +60,19 @@ app.get("/getJobPosts", (req, res) => {
 //contactUs Page
 app.get("/contactUs", (req, res) => {
   res.render("contactUs");
+});
+
+//login Page
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+
+// login page post route
+app.post("/login", (req, res) => {
+  console.log(req.body);
+  const { email, password } = req.body; // Extract email and password from form submission
+
+  res.redirect("/");
 });
 
 //#endregion
