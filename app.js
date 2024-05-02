@@ -58,16 +58,18 @@ app.post(
     if (!errors.isEmpty()) {
       //return res.status(400).json({ errors: errors.array() });
       console.error(errors.array());
+    } else {
+      console.log("POST method triggered....");
+      console.log(
+        `Received name data: ${JSON.stringify(
+          {
+            name: req.body.name_field,
+            age: req.body.age_field,
+            occupation: req.body.occupation_field,
+            salary: req.body.salary_field,
+          }, null, 2)}`
+      );
     }
-    console.log("POST method triggered....");
-    console.log(
-      `Received name data: ${JSON.stringify({
-        name: req.body.name_field,
-        age: req.body.age_field,
-        occupation: req.body.occupation_field,
-        salary: req.body.salary_field,
-      }, null, 3)}`
-    );
   }
 );
 // #endregion
