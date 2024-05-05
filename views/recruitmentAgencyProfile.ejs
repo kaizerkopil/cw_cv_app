@@ -1,0 +1,48 @@
+<%- include('./layouts/header') %>
+<main class="container mt-5">
+  <div class="row justify-content-center">    
+    <div class="col-md-8">
+      <h1 class="card-title mb-4"><%= agency.name %></h1>
+      <div class="card">
+        <div class="card-body">          
+          <div class="row mb-3">
+            <div class="col-md-6">              
+              <p>Email: <%= agency.email %></p>
+              <p>Phone Number: <%= agency.number %></p>
+              <p>Location: <%= agency.location %></p>
+              <p>Company Name: <%= agency.companyName %></p>
+              <p>Company Address: <%= agency.address %></p>
+              <p>Company Description: <%= agency.companyDescription %></p>
+            </div>            
+          </div>           
+          <div >
+            <a href="/edit-profile" class="btn btn-warning me-2">Edit Profile</a>
+          </div>          
+        </div>        
+      </div>
+      <div class="mb-4">
+        <h3 class="mt-4 mb-3">Job Postings</h3>
+        <% if(agency.jobPostings.length > 0) { %>
+          <ul class="list-group">
+            <% agency.jobPostings.forEach(job => { %>
+              <li class="list-group-item">
+                <h5><%= job.title %></h5>
+                <p><strong>Pay:</strong> <%= job.pay %></p>
+                <p><strong>Location:</strong> <%= job.location %></p>
+                <p><strong>Skills Required:</strong> <%= job.skills %></p>
+                <p><strong>Description:</strong> <%= job.description %></p>
+                <div class="btn-group">
+                  <a href="/edit-job/<%= job.id %>" class="btn btn-primary me-2">Edit</a>
+                  <a href="/delete-job/<%= job.id %>" class="btn btn-danger">Delete</a>
+                </div>
+              </li>
+            <% }) %>
+          </ul>
+        <% } else { %>
+          <p class="text-muted">No job postings yet.</p>
+        <% } %>
+      </div>               
+    </div>  
+  </div>
+</main>
+<%- include('./layouts/footer') %>

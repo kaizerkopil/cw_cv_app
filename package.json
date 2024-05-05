@@ -8,6 +8,9 @@
     "start": "npm run watch-server",
     "watch-server": "nodemon app.js"
   },
+  "config": {
+    "syncSeedDb": "true"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

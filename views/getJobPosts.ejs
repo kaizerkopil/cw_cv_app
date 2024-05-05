@@ -1,13 +1,16 @@
 <%- include('./layouts/header') %>
-<main>
-  <div class="container mt-2">
-    <h2 class="h2">All the available Job Posts:</h2>
-      <ul>
-        <% for(i = 0; i < items.length; i++){%>
-          <li><%= items[i] %></li>
-        <%}%>
+<main class="container mt-5">
+  <div class="row justify-content-center">    
+    <div class="col-md-8">
+      <h1 class="mb-4">All Job Posts</h1>
+      <ul class="list-group">
+        <% items.forEach(item => { %>
+          <li class="list-group-item">
+            <a href="/job-post/<%= item.id %>"><%= item.title %> - <%= item.companyName %></a>
+          </li>
+        <% }) %>
       </ul>
-    <h5>hello</h5>
+    </div>
   </div>
 </main>
 <%- include('./layouts/footer') %>

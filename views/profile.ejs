@@ -1,0 +1,110 @@
+<%- include('./layouts/header') %>
+<main class="container mt-5">
+  <div class="row justify-content-center">    
+    <div class="col-md-8">
+      <h1 class="card-title mb-4"><%= user.name %></h1>
+      <div class="card">
+        <div class="card-body">          
+          <div class="row mb-3">
+            <div class="col-md-6">              
+              <p>Email: <%= user.email %></p>
+              <p>Phone Number: <%= user.number %></p>
+              <p>Location: <%= user.location %></p>
+              <p>Job Title: <%= user.occupation %></p>
+              <p>Skills: <%= user.skills %></p>
+            </div>            
+          </div>           
+          <div >
+            <a href="/edit-profile" class="btn btn-warning me-2">Edit Profile</a>
+          </div>          
+        </div>        
+      </div>
+      <div class="mb-4">
+        <% if(user.cv) { %>
+            <h5>CV:</h5>
+            <% if(user.cv.endsWith('.pdf')) { %>
+              <embed src="<%= user.cv %>" width="500" height="375" type="application/pdf">
+            <% } else { %>
+              <p><%= user.cv %></p>
+            <% } %>
+            <div class="d-flex align-items-center">
+              <a href="<%= user.cv %>" class="btn btn-primary me-2" download>Download CV</a>
+              <a href="#" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#replaceCvModal">Replace CV</a>
+              <a href="#" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteCvModal">Delete CV</a>
+            </div>
+          <% } else { %>
+            <p class="text-muted">No CV uploaded</p>
+            <a href="#" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#uploadCvModal">Upload CV</a>
+          <% } %>
+      </div>               
+    </div>  
+          
+  </div>
+</main>
+
+<!-- Replace CV Modal -->
+<div class="modal fade" id="replaceCvModal" tabindex="-1" aria-labelledby="replaceCvModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="replaceCvModalLabel">Replace CV</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="/replace-cv" method="POST" enctype="multipart/form-data">
+          <div class="mb-3">
+            <input type="file" class="form-control" id="newCvInput" name="newCv" required>
+          </div>
+          <div class="text-end">
+            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Replace</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete CV Modal -->
+<div class="modal fade" id="deleteCvModal" tabindex="-1" aria-labelledby="deleteCvModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteCvModalLabel">Delete CV</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete your CV?</p>
+        <div class="text-end">
+          <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+          <a href="/delete-cv" class="btn btn-danger">Delete</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Upload CV Modal -->
+<div class="modal fade" id="uploadCvModal" tabindex="-1" aria-labelledby="uploadCvModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="uploadCvModalLabel">Upload CV</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="/upload-cv" method="POST" enctype="multipart/form-data">
+          <div class="mb-3">
+            <input type="file" class="form-control" id="cvInput" name="cv" required>
+          </div>
+          <div class="text-end">
+            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Upload</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('./layouts/footer') %>

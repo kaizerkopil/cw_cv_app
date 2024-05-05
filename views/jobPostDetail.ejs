@@ -1,0 +1,12 @@
+<%- include('./layouts/header') %>
+<main class="container mt-5">
+  <div class="row justify-content-center">    
+    <div class="col-md-8">
+      <h1 class="mb-4"><%= job.title %> - <%= job.companyName %></h1>
+      <p><strong>Pay:</strong> <%= job.pay %></p>
+      <p><strong>Description:</strong> <%= job.description %></p>
+      <a href="/send-cv" class="btn btn-primary">Send CV</a>
+    </div>
+  </div>
+</main>
+<%- include('./layouts/footer') %>
