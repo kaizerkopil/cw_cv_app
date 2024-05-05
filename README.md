@@ -21,6 +21,8 @@ Muhammad Haider : K2345541
 - ### Packages installed in Node
 
   - **express** : _server-side application_
+  - **body-parser** (now has been integrated into express package itself) : _to capture user data from form input_ 
+  - **express-validator** : _validation for user input from form controls_
   - **nodemon** : _to automate execute of node code reflect on console_
   - **browser-sync** : _used to run the client-side on the server to be used across different devices on the same network which is very helpful in development phrase to test website app across multiple platforms_
   - **ejs** (Embedded JavaScript) : _front-end layout_
