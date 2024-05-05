@@ -2,10 +2,15 @@
 const express = require("express");
 const path = require("path");
 const custom_bs = require("./utils/browserSync");
+const { sequelize, JobSeeker, Job, Agency, Application } = require('./database/database');
+const seedDatabase = require('./database/seedDatabase');
 //#endregion
-
 const app = express();
+
+console.log('Seed Database Configuration:', process.env.npm_package_config_syncSeedDb);
+const PORT = process.env.PORT || 5050;
 custom_bs.initialiseBrowserSync();
+
 //express.urlencoded middleware to parse URL-encoded bodies (from form submissions):
 app.use(express.urlencoded({ extended: true }));
 //#region Adding static files to app
@@ -121,6 +126,77 @@ app.post("/post-job", (req, res) => {
 });
 //#endregion
 
-app.listen(5050, () => {
-  console.log("App is listening on port 5050");
+// #region test routes to check all the data is coming from the database correctly
+
+// Route to get all agencies
+app.get('/agencies', async (req, res) => {
+    try {
+        const agencies = await Agency.findAll({
+          include: [Job]
+        });
+        res.json(agencies);
+    } catch (error) {
+        res.status(500).send('Error retrieving agencies');
+    }
+});
+
+// Route to get all job seekers
+app.get('/jobseekers', async (req, res) => {
+    try {
+        const jobSeekers = await JobSeeker.findAll();
+        res.json(jobSeekers);
+    } catch (error) {
+        res.status(500).send('Error retrieving job seekers');
+    }
+});
+
+// Route to get all jobs
+app.get('/jobs', async (req, res) => {
+  try {
+      const jobs = await Job.findAll({
+        include : [{
+          model : Agency,
+          attributes : ['name', 'email', 'number']
+        }]
+      });
+      res.json(jobs);
+  } catch (error) {
+      res.status(500).send('Error retrieving jobs');
+  }
+});
+
+// Route to get all applications
+app.get('/applications', async (req, res) => {
+  try {
+      const applications = await Application.findAll({
+          include: [JobSeeker, Job]  // This will include JobSeeker and Job data in the results
+      });
+      res.json(applications);
+  } catch (error) {
+      res.status(500).send('Error retrieving applications');
+  }
+});
+
+// #endregion
+
+
+
+app.listen(PORT, async () => {
+  console.log(`Server is running on port ${PORT}`);
+
+  //Environment check whether to sync and seed
+  if(process.env.npm_package_config_syncSeedDb){
+  try {
+    // Synchronize database
+    await sequelize.sync({ force: true });
+    console.log("Database tables created successfully!");
+
+    // Seed the database
+    await seedDatabase();
+    console.log("Database seeded successfully!");
+  } catch (error) {
+    console.error("Failed to initialize database:", error);
+  }
+}
+  console.log('App is fully initialized and ready to accept requests');
 });
