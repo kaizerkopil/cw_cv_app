@@ -1,0 +1,84 @@
+<%- include('./layouts/header.ejs') %>
+    <main>
+        <div class="container mt-2 text-center w-75">
+            <label class="fw-normal fs-2">Registering new user</label>
+            <hr class="mt-1">
+        </div>
+        <!-- #region form-example to capture user data -->
+        <div class="container py-2 mt-4">
+            <form class="row w-100 mx-auto" action="/registerUser" method="post">
+
+                <div class="row py-2 border-0 mx-auto justify-content-center align-items-center">
+                    <div class="col-sm-12 col-md-2 text-lg-center text-md-start ps-1 ps-md-0">
+                        <label class="fw-light fs-5" for="name_field">Name</label>
+                    </div>
+                    <div class="col-md-10 col-lg-6 ps-1"><input class="form-control" type="text" name="name_field"
+                            id="name_field" value="<%- cust.name %>">
+                    </div>
+                    <% if(showValidation !=undefined && showValidation){ %>
+                        <div class="row mt-2 justify-content-center">
+                            <span class="col-sm-12 col-md-2"></span>
+                            <label class="col-md-10 col-lg-6 ps-0 text-danger"><%- errorMessages.nameErrMsg %></label>
+                        </div>
+                        <% } %>
+                </div>
+
+                <div class="row py-2 mx-auto justify-content-center align-items-center">
+                    <div class="col-sm-12 col-md-2 text-lg-center text-md-start ps-1 ps-md-0">
+                        <label class="fw-light fs-5" for="age_field">Age</label>
+                    </div>
+                    <div class="col-md-10 col-lg-6 ps-1"><input class="form-control" type="number" name="age_field"
+                            id="age_field" value="<%- cust.age %>">
+                    </div>
+                    <% if(showValidation !=undefined && showValidation){ %>
+                        <div class="row mt-2 justify-content-center">
+                            <span class="col-sm-12 col-md-2"></span>
+                            <label class="col-md-10 col-lg-6 ps-0 text-danger"><%- errorMessages.ageErrMsg %></label>
+                        </div>
+                        <% } %>
+                </div>
+
+                <div class="row py-2 border-0 mx-auto justify-content-center align-items-center">
+                    <div class="col-sm-12 col-md-2 text-lg-center text-md-start ps-1 ps-md-0">
+                        <label class="fw-light fs-5" for="occupation_field">Occupation</label>
+                    </div>
+                    <div class="col-md-10 col-lg-6 ps-1"><input class="form-control" type="text" name="occupation_field"
+                            id="occupation_field" value="<%- cust.occupation %>">
+                    </div>
+                    <% if(showValidation !=undefined && showValidation){ %>
+                        <div class="row mt-2 justify-content-center">
+                            <span class="col-sm-12 col-md-2"></span>
+                            <label class="col-md-10 col-lg-6 ps-0 text-danger"><%- errorMessages.occupationErrMsg
+                                    %></label>
+                        </div>
+                        <% } %>
+                </div>
+
+                <div class="row border-0 py-2 mx-auto justify-content-center align-items-center">
+                    <div class="col-sm-12 col-md-2 text-lg-center text-md-start ps-1 ps-md-0">
+                        <label class="fw-light fs-5" for="salary_field">Salary</label>
+                    </div>
+                    <div class="col-md col-lg-6 ps-1"><input class="form-control" type="number" step="any"
+                            name="salary_field" id="salary_field" value="<%- cust.salary %>"></div>
+                    <% if(showValidation !=undefined && showValidation){ %>
+                        <div class="row mt-2 justify-content-center">
+                            <span class="col-sm-12 col-md-2"></span>
+                            <label class="col-md-10 col-lg-6 ps-0 text-danger"><%- errorMessages.salaryErrMsg %></label>
+                        </div>
+                        <% } %>
+                </div>
+
+                <div class="row mx-auto mt-2 justify-content-center">
+                    <span class="d-md-block d-none col-md-2"></span>
+                    <div class="d-flex col-md col-lg-6 justify-content-end">
+                        <button class="btn btn-sm btn-primary w-25" type="submit">Submit</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <!-- #endregion  -->
+    </main>
+
+
+    <%- include('./layouts/footer.ejs') %>

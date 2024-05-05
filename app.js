@@ -28,52 +28,6 @@ app.get("/", (req, res) => {
   res.render("home", req.query);
 });
 
-// #region deleted after reused - form capture data using express-validator
-app.post(
-  "/",
-  // Name validation: must not be empty
-  body("name_field")
-    .isLength({ min: 3 })
-    .withMessage("Name is required to be 3 characters long")
-    .trim()
-    .escape(),
-  // Age validation: must be a positive integer
-  body("age_field")
-    .isInt({ gt: 0 })
-    .withMessage("Age must be a positive integer"),
-  // Occupation validation: must not be empty
-  body("occupation_field")
-    .not()
-    .isEmpty()
-    .withMessage("Occupation cannot be empty")
-    .trim()
-    .escape(),
-  // Salary validation: must be a positive number
-  body("salary_field")
-    .isFloat({ gt: 0 })
-    .withMessage("Salary must be positive and cannot be zero"),
-  (req, res) => {
-    //check for errors
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      //return res.status(400).json({ errors: errors.array() });
-      console.error(errors.array());
-    } else {
-      console.log("POST method triggered....");
-      console.log(
-        `Received name data: ${JSON.stringify(
-          {
-            name: req.body.name_field,
-            age: req.body.age_field,
-            occupation: req.body.occupation_field,
-            salary: req.body.salary_field,
-          }, null, 2)}`
-      );
-    }
-  }
-);
-// #endregion
-
 //getJobSeekers for recruiters
 app.get("/getJobSeekers", (req, res) => {
   let jobseekers = [
@@ -109,6 +63,85 @@ app.get("/getJobPosts", (req, res) => {
 app.get("/contactUs", (req, res) => {
   res.render("contactUs");
 });
+
+// #region registerUser Page
+let cust = {
+  name: "",
+  age: "",
+  occupation: "",
+  salary: "",
+};
+
+app.get("/registerUser", (req, res) => {
+  console.log("registerUser getMethod triggered");
+  res.render("registerUser", { showValidation: false, cust });
+});
+
+app.post(
+  "/registerUser",
+  // Name validation: must not be empty
+  body("name_field")
+    .isLength({ min: 3 })
+    .withMessage("Name is required to be 3 characters long")
+    .trim()
+    .escape(),
+  // Age validation: must be a positive integer
+  body("age_field")
+    .isInt({ gt: 0 })
+    .withMessage("Age must be a positive integer"),
+  // Occupation validation: must not be empty
+  body("occupation_field")
+    .not()
+    .isEmpty()
+    .withMessage("Occupation cannot be empty")
+    .trim()
+    .escape(),
+  // Salary validation: must be a positive number
+  body("salary_field")
+    .isFloat({ gt: 0 })
+    .withMessage("Salary must be positive and cannot be zero"),
+  (req, res) => {
+    cust.name = req.body.name_field;
+    cust.age = req.body.age_field;
+    cust.occupation = req.body.occupation_field;
+    cust.salary = req.body.salary_field;
+
+    //check for errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      let errorMessages = {
+        nameErrMsg: "",
+        ageErrMsg: "",
+        occupationErrMsg: "",
+        salaryErrMsg: "",
+      };
+      let errorArray = errors.array();
+      errorArray.forEach((error) => {
+        switch (error.path) {
+          case "name_field":
+            errorMessages.nameErrMsg = error.msg;
+            break;
+          case "age_field":
+            errorMessages.ageErrMsg = error.msg;
+            break;
+          case "occupation_field":
+            errorMessages.occupationErrMsg = error.msg;
+            break;
+          case "salary_field":
+            errorMessages.salaryErrMsg = error.msg;
+            break;
+          default:
+            break;
+        }
+      });
+      console.error(JSON.stringify({errorMessages : errorMessages}, null, 2))
+      res.render("registerUser", { showValidation: true, errorMessages, cust });
+    } else {
+      //send status code OK with cust details
+      return res.status(200).json({ statusCode: 200, cust: cust });
+    }
+  }
+);
 
 //#endregion
 
