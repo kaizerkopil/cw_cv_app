@@ -1,0 +1,40 @@
+
+<%- include('./layouts/header') %>
+<main class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <h1 class="card-title mb-4">Post a Job</h1>
+      <div class="card">
+        <div class="card-body">
+          <form action="/post-job" method="POST">
+            <div class="mb-3">
+              <label for="titleInput" class="form-label">Job Title</label>
+              <input type="text" class="form-control" id="titleInput" name="title" required>
+            </div>
+            <div class="mb-3">
+              <label for="payInput" class="form-label">Pay</label>
+              <input type="text" class="form-control" id="payInput" name="pay" required>
+            </div>
+            <div class="mb-3">
+              <label for="locationInput" class="form-label">Location</label>
+              <input type="text" class="form-control" id="locationInput" name="location" required>
+            </div>
+            <div class="mb-3">
+              <label for="skillsInput" class="form-label">Skills Required</label>
+              <input type="text" class="form-control" id="skillsInput" name="skills" required>
+            </div>
+            <div class="mb-3">
+              <label for="descriptionInput" class="form-label">Description</label>
+              <textarea class="form-control" id="descriptionInput" rows="5" name="description" required></textarea>
+            </div>
+            <div class="text-end">
+              <button type="submit" class="btn btn-primary">Post Job</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('./layouts/footer') %>
