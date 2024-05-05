@@ -19,6 +19,17 @@ app.use("/utils", express.static("./utils"));
 //setting the view engine
 app.set("view engine", "ejs");
 
+// Define a dummy user object (replace with data from your database)
+const user = {
+  name: "John Doe",
+  email: "john@example.com",
+  skills: "JavaScript, HTML, CSS",
+  number: "03203210",
+  location: "london",
+  occupation: "Web Developer",
+  cv: "/img/CV.pdf", // Path to the uploaded CV file
+};
+
 //#region Configuring the app routes
 
 //home page route
@@ -67,6 +78,16 @@ app.get("/login", (req, res) => {
   res.render("login");
 });
 
+//Register Page
+app.get("/register", (req, res) => {
+  res.render("register");
+});
+
+//Profile Page for job seekers
+app.get("/profile", (req, res) => {
+  res.render("profile", { user });
+});
+
 // login page post route
 app.post("/login", (req, res) => {
   console.log(req.body);
@@ -74,7 +95,6 @@ app.post("/login", (req, res) => {
 
   res.redirect("/");
 });
-
 //#endregion
 
 app.listen(5050, () => {

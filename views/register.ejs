@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registration Page</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light d-flex align-items-center" style="height: 100vh;">
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card card-shadow text-center">
+          <div class="card-body p-5 shadow rounded">
+            
+            <h3 class="mb-5">Register</h3>
+            
+            <form action="/register" method="POST" enctype="multipart/form-data">
+              <div class="form-floating mb-4">
+                <input type="text" class="form-control" id="nameInput" name="name" placeholder="Name" required>
+                <label for="nameInput">Name</label>
+              </div>
+
+              <div class="form-floating mb-4">
+                <input type="email" class="form-control" id="emailInput" name="email" placeholder="Email" required>
+                <label for="emailInput">Email</label>
+              </div>
+
+              <div class="form-floating mb-4">
+                <input type="password" class="form-control" id="passwordInput"  name="password" placeholder="Password" required>
+                <label for="passwordInput">Password</label>
+              </div>
+
+              <div class="form-floating mb-4">
+                <input type="text" class="form-control" id="skillsInput"  name="skills" placeholder="Skills" required>
+                <label for="skillsInput">Skills</label>
+              </div>
+
+              <div class="form-floating mb-4">
+                <input type="text" class="form-control" id="jobtitle"  name="jobtitle" placeholder="job Title" required>
+                <label for="jobtitleInput">Job Title</label>
+              </div>
+
+              <div class="mb-4">
+                <input type="file" class="form-control" id="cvInput" name="cv" required>
+                <label for="cvInput">Upload CV</label>
+              </div>
+
+              <div class="d-grid gap-2 col-6 mx-auto">
+                <button type="submit" class="btn btn btn-outline-dark btn-md mb-4">REGISTER</button>
+              </div>
+
+              <p>Already have an account? <a href="/login">Login</a></p>
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
