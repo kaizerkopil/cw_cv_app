@@ -44,7 +44,23 @@ const jobPosts = require("./public/js/dummyJobPosts");
 
 //home page route
 app.get("/", (req, res) => {
-  res.render("home", req.query);
+  let currentUser = 'jobseeker';
+  if(currentUser === 'jobseeker'){
+    res.redirect('/jobseeker')
+  }else{
+    res.redirect('/agency')
+  }
+  //res.render("home", req.query);
+});
+
+//agency home page route
+app.get("/agency", (req, res) => {
+  res.render("home_agency", req.query);
+});
+
+//jobseeker home page route
+app.get("/jobseeker", (req, res) => {
+  res.render("home_jobseeker", req.query);
 });
 
 //getJobSeekers for recruiters
@@ -165,6 +181,8 @@ app.post(
   }
 );
 
+// #endregion registerUser Page
+
 //login Page
 app.get("/login", (req, res) => {
   res.render("login");
@@ -176,18 +194,18 @@ app.get("/register", (req, res) => {
 });
 
 //Profile Page for job seekers
-app.get("/profile", (req, res) => {
-  res.render("profile", { user });
+app.get("/jobSeekerProfile", (req, res) => {
+  res.render("jobSeekerProfile", { user });
 });
 
-//Job Posting for recruitment Agency
-app.get("/jobPosting", (req, res) => {
-  res.render("jobPosting", { user });
+//Upload Job Post for recruitment Agency
+app.get("/uploadJobPost", (req, res) => {
+  res.render("uploadJobPost", { user });
 });
 
 //Recruitment Agency Profile
-app.get("/recruitmentAgencyProfile", (req, res) => {
-  res.render("recruitmentAgencyProfile", { agency });
+app.get("/agencyProfile", (req, res) => {
+  res.render("agencyProfile", { agency });
 });
 
 // login page post route
@@ -238,7 +256,7 @@ app.get('/jobs', async (req, res) => {
       const jobs = await Job.findAll({
         include : [{
           model : Agency,
-          attributes : ['name', 'email', 'number']
+          attributes : ['id', 'name', 'email', 'number']
         }]
       });
       res.json(jobs);
