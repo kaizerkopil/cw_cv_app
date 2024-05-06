@@ -1,13 +1,8 @@
 module.exports = (sequelize, DataTypes) => {
-    return sequelize.define('JobSeeker', {
+    return sequelize.define('JobSeeker', {    
       name: {
         type: DataTypes.STRING,
         allowNull: false
-      },
-      email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
       },
       location: {
         type: DataTypes.STRING
@@ -18,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       skills: {
         type: DataTypes.STRING
       },
-      CV: {
+      cv: {
         type: DataTypes.STRING
       }
     });

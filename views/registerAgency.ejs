@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registration Page</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light d-flex align-items-center vh-100">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card shadow ">
+          <div class="card header border-0">
+            <span class="h3 text-center pt-4">Register new JobAgency</span>
+          </div>
+          <div class="card-body p-4 rounded">
+            <form action="/registerAgency" method="POST" enctype="multipart/form-data">
+              <input type="hidden" name="userType" id="inputUserType">
+              <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="nameInput" name="name" placeholder="Name" required>
+                <label for="nameInput">Name</label>
+              </div>
+
+              <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="emailInput" name="email" placeholder="Email" required>
+                <label for="emailInput">Email</label>
+              </div>
+
+              <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="passwordInput" name="password" placeholder="Password"
+                  required>
+                <label for="passwordInput">Password</label>
+              </div>
+
+              <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="phonenum" name="phonenum" placeholder="Contact" required>
+                <label for="phonenum">Phone no</label>
+              </div>
+
+              <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="address" name="address" placeholder="Address" required>
+                <label for="address">Address</label>
+              </div>
+
+              <textarea class="form-control mb-3" aria-label="With textarea" rows="5" placeholder="Description"
+                name="description" required></textarea>
+
+              <div class="mb-3">
+                <label class="ps-1" for="location">Select Location</label>
+                <select class="form-control select2" id="location" name="location" required>
+                  <option value="London">London</option>
+                  <option value="Kingston">Kingston</option>
+                  <option value="Leicester">Leicester</option>
+                  <option value="Scotland">Scotland</option>
+                  <option value="Wales">Wales</option>
+                </select>
+              </div>
+              <div class="d-grid gap-2 col-4 mx-auto">
+                <button type="submit" class="btn btn btn-outline-dark btn-md mb-4">REGISTER</button>
+              </div>
+
+              <p class="text-center">Already have an account? <a href="/login">Login</a></p>
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var urlParams = new URLSearchParams(window.location.search);
+      var userType = urlParams.get('userType');
+      var hiddenInput = document.querySelector('#inputUserType');
+      hiddenInput.value = userType;
+    });
+  </script>
+</body>
+
+</html>

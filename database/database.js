@@ -15,12 +15,14 @@ const defineJobSeeker = require('../models/jobseeker');
 const defineJob = require('../models/job');
 const defineAgency = require('../models/agency');
 const defineApplication = require('../models/application');
+const defineUser = require('../models/user');
 
 // Instantiate models using the imported functions
 const JobSeeker = defineJobSeeker(sequelize, DataTypes);
 const Job = defineJob(sequelize, DataTypes);
 const Agency = defineAgency(sequelize, DataTypes);
 const Application = defineApplication(sequelize, DataTypes);
+const User = defineUser(sequelize, DataTypes);
 
 // Define relationships between models
 JobSeeker.belongsToMany(Job, { through: Application });
@@ -34,6 +36,12 @@ Application.belongsTo(Job);
 
 Agency.hasMany(Job);
 Job.belongsTo(Agency);
+
+User.hasOne(Agency);
+Agency.belongsTo(User);
+
+User.hasOne(JobSeeker);
+JobSeeker.belongsTo(User);
 
 // // Synchronize all defined models with the database
 // sequelize.sync({ force: true }) // `force: true` will drop existing tables and recreate them
@@ -50,5 +58,6 @@ module.exports = {
   JobSeeker,
   Job,
   Agency,
-  Application
+  Application,
+  User
 };

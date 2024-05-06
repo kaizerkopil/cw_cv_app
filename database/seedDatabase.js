@@ -1,4 +1,4 @@
-const { Agency, Application, Job, JobSeeker, sequelize } = require('./database');
+const { User, Agency, Application, Job, JobSeeker, sequelize } = require('./database');
 
 // Seed function
 async function seedDatabase() {
@@ -6,44 +6,80 @@ async function seedDatabase() {
     await sequelize.sync({ force: true });
     console.log("Database tables dropped and re-created.");
 
+    //creating users
+    const userAgency1 = await User.create({
+      userType : "agency",
+      email: "info@creativesol.com",
+      password : "abc123",
+    });
+
+    const userAgency2 = await User.create({
+      userType : "agency",
+      email: "contact@techinnov.com",      
+      password : "12345",
+    });
+
+     const userJobSeeker1 = await User.create({
+      userType : "jobseeker",
+      email: "john.doe@example.com",
+      password : "john123",
+    });
+
+    const userJobSeeker2 = await User.create({
+      userType : "jobseeker",
+      email: "jane.smith@example.com",
+      password : "jane123",
+    });
+
+    console.log(`SeedingDatabase_userAgency1.id: ${userAgency1.id}`)
     // Creating Agencies
     const creativeSolutions = await Agency.create({
-      name: "Creative Solutions",
-      email: "info@creativesol.com",
-      number: "1234567890",
+      name: "Creative Solutions",   
+      phonenum: "1234567890",
       location: "New York",
       companyName: "Creative Solutions Inc.",
       address: "123 Baker Street",
-      companyDescription: "A creative agency focusing on innovative marketing solutions."
+      description: "A creative agency focusing on innovative marketing solutions.",
+      UserId : userAgency1.id
     });
 
+    console.log(`SeedingDatabase_userAgency2.id: ${userAgency2.id}`)
+
     const techInnovators = await Agency.create({
-      name: "Tech Innovators",
-      email: "contact@techinnov.com",
-      number: "0987654321",
+      userType : "agency",
+      name: "Tech Innovators",     
+      phonenum: "0987654321",
       location: "San Francisco",
       address: "456 Elm Street",
-      companyDescription: "Leading tech solutions provider specializing in AI and machine learning."
+      description: "Leading tech solutions provider specializing in AI and machine learning.",
+      UserId : userAgency2.id
     });
+
+    console.log(`SeedingDatabase_userJobSeeker1.id: ${userJobSeeker1.id}`)
 
     // Creating Job Seekers
     const johnDoe = await JobSeeker.create({
+      userType : "jobseeker",
       name: "John Doe",
-      email: "john.doe@example.com",
       location: "New York",
       occupation: "Software Developer",
       skills: "JavaScript, React",
-      CV: "john-resume.pdf"
+      cv: "john-resume.pdf",
+      UserId : userJobSeeker1.id
     });
 
+    console.log(`SeedingDatabase_userJobSeeker2.id: ${userJobSeeker2.id}`)
+
     const janeSmith = await JobSeeker.create({
+      userType : "jobseeker",
       name: "Jane Smith",
-      email: "jane.smith@example.com",
       location: "San Francisco",
       occupation: "Data Scientist",
       skills: "Python, SQL",
-      CV: "jane-resume.pdf"
+      cv: "jane-resume.pdf",
+      UserId : userJobSeeker2.id
     });
+
 
     // Creating Jobs
     const frontendDev = await Job.create({

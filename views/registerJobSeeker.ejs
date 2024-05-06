@@ -15,8 +15,10 @@
       <div class="col-md-8">
         <div class="card shadow">
           <div class="card-body p-5 rounded">
-            <h3 class="mb-5 text-center">Register</h3>
-            <form action="/register" method="POST" enctype="multipart/form-data">
+            <h3 class="mb-5 text-center">Register new JobSeeker</h3>
+            <form action="/registerJobSeeker" method="POST" enctype="multipart/form-data">
+              <input type="hidden" name="userType" id="inputUserType">
+              
               <div class="form-floating mb-4">
                 <input type="text" class="form-control" id="nameInput" name="name" placeholder="Name" required>
                 <label for="nameInput">Name</label>
@@ -35,7 +37,7 @@
 
               <div class="mb-4">
                 <label for="skillsInput">Skills</label>
-                <select class="form-control select2-multiple" id="skillsInput" name="skills[]" multiple required>
+                <select class="form-control select2-multiple" id="skillsInput" name="skills" multiple required> 
                   <option value="JavaScript">JavaScript</option>
                   <option value="Python">Python</option>
                   <option value="Java">Java</option>
@@ -45,9 +47,20 @@
                 </select>
               </div>
 
+              <div class="mb-4">
+                <label for="location">Location</label>
+                <select class="form-control select2" id="location" name="location" required>
+                  <option value="London">London</option>
+                  <option value="Kingston">Kingston</option>
+                  <option value="Leicester">Leicester</option>
+                  <option value="Scotland">Scotland</option>
+                  <option value="Wales">Wales</option>
+                </select>
+              </div>
+
               <div class="form-floating mb-4">
-                <input type="text" class="form-control" id="jobtitle" name="jobtitle" placeholder="job Title" required>
-                <label for="jobtitleInput">Job Title</label>
+                <input type="text" class="form-control" id="occupation" name="occupation" placeholder="job Title" required>
+                <label for="occupation">Job Title</label>
               </div>
 
               <div class="mb-4">
@@ -77,6 +90,12 @@
       placeholder: "Select skills", // This adds a placeholder
       allowClear: true // This option allows users to remove selections
     });
+  });
+  document.addEventListener('DOMContentLoaded', function () {
+    var urlParams = new URLSearchParams(window.location.search);
+    var userType = urlParams.get('userType');
+    var hiddenInput = document.querySelector('#inputUserType');
+    hiddenInput.value = userType;
   });
 </script>
 </body>

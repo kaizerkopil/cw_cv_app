@@ -1,19 +1,25 @@
 //loading environment variables to be used across all the files in the project
-require('dotenv').config();
+require("dotenv").config();
 
 //#region Requiring NPM Packages
 const express = require("express");
 const { body, validationResult } = require("express-validator");
 const path = require("path");
-const multer = require('multer');
-const session = require('express-session');
-const flash = require('connect-flash');
-
+const multer = require("multer");
+const session = require("express-session");
+const flash = require("connect-flash");
 
 //#region requiring local files
 const custom_bs = require("./utils/browserSync");
-const seedDatabase = require('./database/seedDatabase');
-const { sequelize, JobSeeker, Job, Agency, Application } = require('./database/database');
+const seedDatabase = require("./database/seedDatabase");
+const {
+  sequelize,
+  User,
+  JobSeeker,
+  Job,
+  Agency,
+  Application,
+} = require("./database/database");
 
 const upload = multer(); // for simplicity, storing files in memory
 //#endregion
@@ -35,11 +41,13 @@ app.use("/utils", express.static("./utils"));
 //#endregion
 
 //configuring session
-app.use(session({
-  secret: 'AX_100', // secret key to sign the session ID cookie
-  saveUninitialized: true,
-  resave: false
-}));
+app.use(
+  session({
+    secret: "AX_100", // secret key to sign the session ID cookie
+    saveUninitialized: true,
+    resave: false,
+  })
+);
 app.use(flash());
 
 //setting the view engine
@@ -62,16 +70,16 @@ const jobPosts = require("./public/js/dummyJobPosts");
 
 //home page route
 app.get("/", (req, res) => {
-  let currentUser = 'agency';
-  if(currentUser === 'jobseeker'){
-    res.redirect('/jobseeker')
-  }else{
+  let currentUser = "agency";
+  if (currentUser === "jobseeker") {
+    res.redirect("/jobseeker");
+  } else {
     req.query.id = 2;
-    req.query.name = 'jack';
-    req.query.location = 'wimbley';
+    req.query.name = "jack";
+    req.query.location = "wimbley";
     let queryString = new URLSearchParams(req.query).toString();
-    console.log(`queryString : ${queryString}`)
-    res.redirect('/agency?' + queryString);
+    console.log(`queryString : ${queryString}`);
+    res.redirect("/agency?" + queryString);
   }
   //res.render("home", req.query);
 });
@@ -79,7 +87,7 @@ app.get("/", (req, res) => {
 //agency home page route
 app.get("/agency", (req, res) => {
   let message = "User have been saved";
-  res.render("home_agency", {query : req.query, message : message});
+  res.render("home_agency", { query: req.query, message: message });
 });
 
 //jobseeker home page route
@@ -178,7 +186,7 @@ app.post(
             break;
         }
       });
-      console.error(JSON.stringify({errorMessages : errorMessages}, null, 2))
+      console.error(JSON.stringify({ errorMessages: errorMessages }, null, 2));
       res.render("registerUser", { showValidation: true, errorMessages, cust });
     } else {
       //send status code OK with cust details
@@ -191,44 +199,100 @@ app.post(
 
 //login Page
 app.get("/login", (req, res) => {
-  let messages = req.flash('success');
+  let messages = req.flash("success");
   console.log("redirected from register page: " + messages);
-  res.render("login", { messages : messages });
+  res.render("login", { messages: messages });
 });
 
-//Register Page
-app.get("/register", (req, res) => {
-  res.render("register");
+// #region Register Page for JobSeeker
+app.get("/registerJobSeeker", (req, res) => {
+  res.render("registerJobSeeker");
 });
 
-app.post('/register', upload.single('cv'), (req, res) => {
-  console.log("Start: Register post method triggered")
-
-  let { name, email, password, jobtitle } = req.body;
+app.post("/registerJobSeeker", upload.single("cv"), async (req, res) => {
+  
+  let { userType, name, email, password, jobtitle, occupation, location } = req.body;
   let cv = req.file; // multer provides the file info in req.file
-
   let skills = "";
-  if(Array.isArray(req.body.skills)){
-    skills = req.body.skills.join(',');
-  }
-  skills = String(req.body.skills);
 
+  if (Array.isArray(req.body.skills)) {
+    skills = req.body.skills.join(",");
+  }else{ skills = String(req.body.skills);  }
+
+  //capturing user data
+  let userData = {
+    userType : userType,
+    email: email,
+    password: password
+  }
+
+  //saving user data to database to get generated id
+  let savedUser = await User.create(userData);
+
+  //creating jobseeker object to save
   let jobseeker = {
-    name : name,
-    email : email,
-    password : password,
-    jobtitle : jobtitle,
-    cv: cv ? cv.originalname : 'No file uploaded',
-    skills : skills
+    name: name,
+    location: location,
+    occupation: occupation,
+    cv: cv ? cv.originalname : "No file uploaded",
+    skills: skills,
+    UserId : savedUser.id
+  };
+
+  // saving jobseeker to database
+  await JobSeeker.create(jobseeker);
+  console.log(`${jobseeker.name} have been saved to the database`)
+  // Render login view and pass the messages (empty if none)
+  req.flash(
+    "success",
+    "Registration for JobSeeker has been successful. Please try to log in now"
+  );
+  res.redirect("login");
+});
+
+// #endregion
+
+// #region RegisterPage for Agency
+app.get("/registerAgency", (req, res) => {
+  res.render("registerAgency");
+});
+
+app.post("/registerAgency", upload.none(), async (req, res) => {
+  let { userType, name, email, password, phonenum, address, description, location } = req.body;
+
+  //capturing userdata
+  let userData = {
+    userType : userType,
+    email: email,
+    password: password
   }
 
-  // save jobseeker to database
+  //saving userdata to database to generate primaryKey id
+  let savedUser = await User.create(userData);
+  console.log(`savedUserAgency: ${JSON.stringify(savedUser, null, 2)}`);
 
-  //
+  //creating agency object to be saved to database
+  let agency = {
+    name: name,
+    phonenum: phonenum,
+    address: address,
+    description: description,
+    location: location,
+    UserId : savedUser.id
+  };
+
+  // saving agency to database
+  await Agency.create(agency);
+  console.log(`${agency.name} have been saved to the database`)
   // Render login view and pass the messages (empty if none)
-  req.flash('success', 'Registration for JobSeeker successsfuly. Please try to log in now');
-  res.redirect('login');
-})
+  req.flash('success', '');
+  req.flash(
+    "success",
+    "Registration for Agency has been successful. Please try to log in now"
+  );
+  res.redirect("login");
+});
+// #endregion
 
 //Profile Page for job seekers
 app.get("/jobSeekerProfile", (req, res) => {
@@ -266,74 +330,75 @@ app.post("/post-job", (req, res) => {
 // #region test routes to check all the data is coming from the database correctly
 
 // Route to get all agencies
-app.get('/agencies', async (req, res) => {
-    try {
-        const agencies = await Agency.findAll({
-          include: [Job]
-        });
-        res.json(agencies);
-    } catch (error) {
-        res.status(500).send('Error retrieving agencies');
-    }
+app.get("/agencies", async (req, res) => {
+  try {
+    const agencies = await Agency.findAll({
+      include: [Job],
+    });
+    res.json(agencies);
+  } catch (error) {
+    res.status(500).send("Error retrieving agencies");
+  }
 });
 
 // Route to get all job seekers
-app.get('/jobseekers', async (req, res) => {
-    try {
-        const jobSeekers = await JobSeeker.findAll();
-        res.json(jobSeekers);
-    } catch (error) {
-        res.status(500).send('Error retrieving job seekers');
-    }
+app.get("/jobseekers", async (req, res) => {
+  try {
+    const jobSeekers = await JobSeeker.findAll();
+    res.json(jobSeekers);
+  } catch (error) {
+    res.status(500).send("Error retrieving job seekers");
+  }
 });
 
 // Route to get all jobs
-app.get('/jobs', async (req, res) => {
+app.get("/jobs", async (req, res) => {
   try {
-      const jobs = await Job.findAll({
-        include : [{
-          model : Agency,
-          attributes : ['id', 'name', 'email', 'number']
-        }]
-      });
-      res.json(jobs);
+    const jobs = await Job.findAll({
+      include: [
+        {
+          model: Agency,
+          attributes: ["id", "name", "email", "number"],
+        },
+      ],
+    });
+    res.json(jobs);
   } catch (error) {
-      res.status(500).send('Error retrieving jobs');
+    res.status(500).send("Error retrieving jobs");
   }
 });
 
 // Route to get all applications
-app.get('/applications', async (req, res) => {
+app.get("/applications", async (req, res) => {
   try {
-      const applications = await Application.findAll({
-          include: [JobSeeker, Job]  // This will include JobSeeker and Job data in the results
-      });
-      res.json(applications);
+    const applications = await Application.findAll({
+      include: [JobSeeker, Job], // This will include JobSeeker and Job data in the results
+    });
+    res.json(applications);
   } catch (error) {
-      res.status(500).send('Error retrieving applications');
+    res.status(500).send("Error retrieving applications");
   }
 });
 
 // #endregion
 
-
-
 app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
 
   //Environment check whether to sync and seed
-  if(process.env.SEED_SYNC_DATABASE){
-  try {
-    // Synchronize database
-    await sequelize.sync({ force: true });
-    console.log("Database tables created successfully!");
+  console.log(`process.env.SEED_SYNC_DATABASE: ${process.env.SEED_SYNC_DATABASE}`)
+  if (process.env.SEED_SYNC_DATABASE === 'true') {
+    try {
+      // Synchronize database
+      await sequelize.sync({ force: true });
+      console.log("Database tables created successfully!");
 
-    // Seed the database
-    await seedDatabase();
-    console.log("Database seeded successfully!");
-  } catch (error) {
-    console.error("Failed to initialize database:", error);
+      // Seed the database
+      await seedDatabase();
+      console.log("Database seeded successfully!");
+    } catch (error) {
+      console.error("Failed to initialize database:", error);
+    }
   }
-}
-  console.log('App is fully initialized and ready to accept requests');
+  console.log("App is fully initialized and ready to accept requests");
 });

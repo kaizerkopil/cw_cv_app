@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Page</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-light d-flex align-items-center" style="height: 100vh;">
-    <!-- Modal for displaying messages -->
-  <% if (messages && messages.length > 0) { %>
+  <!-- Modal for displaying messages -->
+  <% if (messages && messages.length> 0) { %>
     <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -25,49 +27,76 @@
         </div>
       </div>
     </div>
-  <% } %>
+    <% } %>
 
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-md-5">
-        <div class="card card-shadow text-center">
-          <div class="card-body p-5 shadow rounded">
-            
-            <h3 class="mb-5">Welcome</h3>
-            
-            <form action="/login" method="POST">
-              <div class="form-floating mb-4">
-                <input type="email" class="form-control" id="emailInput" name="email" placeholder="Email" required>
-                <label for="emailInput">Email</label>
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-8 col-xl-6">
+            <div class="card card-shadow text-center">
+              <div class="card-body p-5 shadow rounded">
+
+                <h3 class="mb-5">Welcome</h3>
+
+                <form action="/login" method="POST">
+                  <div class="form-floating mb-4">
+                    <input type="email" class="form-control" id="emailInput" name="email" placeholder="Email" required>
+                    <label for="emailInput">Email</label>
+                  </div>
+
+                  <div class="form-floating mb-4">
+                    <input type="password" class="form-control" id="passwordInput" name="password"
+                      placeholder="Password" required>
+                    <label for="passwordInput">Password</label>
+                  </div>
+                  <div class="d-grid gap-2 col-6 mx-auto ">
+                    <button type="submit" class="btn btn btn-outline-dark btn-md mb-4">LOGIN</button>
+                  </div>
+
+                  <p>Don't have an account? <a href="" data-bs-toggle="modal" data-bs-target="#chooseUserType">Sign Up</a></p>
+                </form>
+
               </div>
-
-              <div class="form-floating mb-4">
-                <input type="password" class="form-control" id="passwordInput"  name="password" placeholder="Password" required>
-                <label for="passwordInput">Password</label>
-              </div>
-              <div class="d-grid gap-2 col-6 mx-auto ">                
-                <button type="submit" class="btn btn btn-outline-dark btn-md mb-4">LOGIN</button>
-              </div>
-
-              <p>Don't have an account? <a href="/register">Sign Up</a></p>
-            </form>
-
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+      <!-- #region Modals -->
+      <div class="modal fade show" id="chooseUserType" tabindex="-1" aria-labelledby="chooseUserTypeLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="chooseUserTypeLabel">Choose User</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="d-flex flex-column modal-body align-items-center gap-2">
+              <h4 class="fw-semibold">Please select your user type?</h4>
+              <ul class="list-group w-50 text-center">
+                <li class="list-group-item list-group-item-action"><a href="/registerJobSeeker?userType=jobseeker" class="text-decoration-none text-black">Jobseeker</a></li>
+                <li class="list-group-item list-group-item-action"><a href="/registerAgency?userType=agency" class="text-decoration-none text-black">Agency</a></li>
+              </ul>   
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-  <!-- Script to show modal if messages exist -->
-  <% if (messages && messages.length > 0) { %>
-    <script>
-      $(document).ready(function() {
-        $('#loginModal').modal('show');
-      });
-    </script>
-  <% } %>
+
+      <!-- #endregion -->
+
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+
+      <!-- Script to show modal if messages exist -->
+      <% if (messages && messages.length> 0) { %>
+        <script>
+          $(document).ready(function () {
+            $('#loginModal').modal('show');
+          });
+        </script>
+        <% } %>
 </body>
+
 </html>

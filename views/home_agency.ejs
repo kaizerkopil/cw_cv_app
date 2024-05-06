@@ -6,11 +6,5 @@
   <div class="container mt-2 text-center">
     <h1>The Home page for AGENCY</h1>
   </div>
-  <p><strong>Query Parameters:</strong></p>
-    <ul>
-      <% for (const [key, value] of Object.entries(query)) { %>
-        <li><%= key %>: <%= value %></li>
-      <% } %>
-    </ul>
 </main>
 <%- include('./layouts/footer.ejs') %>
