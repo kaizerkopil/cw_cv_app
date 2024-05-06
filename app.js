@@ -1,14 +1,24 @@
-//#region Require statements
+//loading environment variables to be used across all the files in the project
+require('dotenv').config();
+
+//#region Requiring NPM Packages
 const express = require("express");
 const { body, validationResult } = require("express-validator");
 const path = require("path");
+const multer = require('multer');
+const session = require('express-session');
+const flash = require('connect-flash');
+
+
+//#region requiring local files
 const custom_bs = require("./utils/browserSync");
-const { sequelize, JobSeeker, Job, Agency, Application } = require('./database/database');
 const seedDatabase = require('./database/seedDatabase');
+const { sequelize, JobSeeker, Job, Agency, Application } = require('./database/database');
+
+const upload = multer(); // for simplicity, storing files in memory
 //#endregion
 const app = express();
 
-console.log('Seed Database Configuration:', process.env.npm_package_config_syncSeedDb);
 const PORT = process.env.PORT || 5050;
 custom_bs.initialiseBrowserSync();
 
@@ -23,6 +33,14 @@ app.use("/img", express.static("./public/img"));
 app.use("/bootstrap", express.static("./node_modules/bootstrap/dist"));
 app.use("/utils", express.static("./utils"));
 //#endregion
+
+//configuring session
+app.use(session({
+  secret: 'AX_100', // secret key to sign the session ID cookie
+  saveUninitialized: true,
+  resave: false
+}));
+app.use(flash());
 
 //setting the view engine
 app.set("view engine", "ejs");
@@ -44,18 +62,24 @@ const jobPosts = require("./public/js/dummyJobPosts");
 
 //home page route
 app.get("/", (req, res) => {
-  let currentUser = 'jobseeker';
+  let currentUser = 'agency';
   if(currentUser === 'jobseeker'){
     res.redirect('/jobseeker')
   }else{
-    res.redirect('/agency')
+    req.query.id = 2;
+    req.query.name = 'jack';
+    req.query.location = 'wimbley';
+    let queryString = new URLSearchParams(req.query).toString();
+    console.log(`queryString : ${queryString}`)
+    res.redirect('/agency?' + queryString);
   }
   //res.render("home", req.query);
 });
 
 //agency home page route
 app.get("/agency", (req, res) => {
-  res.render("home_agency", req.query);
+  let message = "User have been saved";
+  res.render("home_agency", {query : req.query, message : message});
 });
 
 //jobseeker home page route
@@ -63,29 +87,11 @@ app.get("/jobseeker", (req, res) => {
   res.render("home_jobseeker", req.query);
 });
 
-//getJobSeekers for recruiters
-app.get("/getJobSeekers", (req, res) => {
-  let jobseekers = [
-    "Stareo Mark",
-    "Marshal Jorun",
-    "Marko Patel",
-    "Nisha Stuash",
-  ];
-  res.render("getJobSeekers", { items: jobseekers }, (error, ejsPage) => {
-    if (error) {
-      console.log(`The error thrown by page : ${error.message}`);
-      res.status(500).send("An error occurred");
-    } else {
-      res.send(ejsPage);
-    }
-  });
-});
-
 //getJobPosts for jobSeekers
 app.get("/getJobPosts", (req, res) => {
-  let jobs = ["job1", "job2", "job3", "job4"];
   res.render("getJobPosts", { items: jobPosts });
 });
+
 // Route to show job post details
 app.get("/job-post/:id", (req, res) => {
   const jobId = req.params.id;
@@ -185,13 +191,44 @@ app.post(
 
 //login Page
 app.get("/login", (req, res) => {
-  res.render("login");
+  let messages = req.flash('success');
+  console.log("redirected from register page: " + messages);
+  res.render("login", { messages : messages });
 });
 
 //Register Page
 app.get("/register", (req, res) => {
   res.render("register");
 });
+
+app.post('/register', upload.single('cv'), (req, res) => {
+  console.log("Start: Register post method triggered")
+
+  let { name, email, password, jobtitle } = req.body;
+  let cv = req.file; // multer provides the file info in req.file
+
+  let skills = "";
+  if(Array.isArray(req.body.skills)){
+    skills = req.body.skills.join(',');
+  }
+  skills = String(req.body.skills);
+
+  let jobseeker = {
+    name : name,
+    email : email,
+    password : password,
+    jobtitle : jobtitle,
+    cv: cv ? cv.originalname : 'No file uploaded',
+    skills : skills
+  }
+
+  // save jobseeker to database
+
+  //
+  // Render login view and pass the messages (empty if none)
+  req.flash('success', 'Registration for JobSeeker successsfuly. Please try to log in now');
+  res.redirect('login');
+})
 
 //Profile Page for job seekers
 app.get("/jobSeekerProfile", (req, res) => {
@@ -285,7 +322,7 @@ app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
 
   //Environment check whether to sync and seed
-  if(process.env.npm_package_config_syncSeedDb){
+  if(process.env.SEED_SYNC_DATABASE){
   try {
     // Synchronize database
     await sequelize.sync({ force: true });

@@ -1,9 +1,13 @@
+//loading environment variables
+//require('dotenv').config();
+
 const { Sequelize, DataTypes } = require('sequelize');
 
 // Initialize the Sequelize instance for SQLite database
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: './database/database.sqlite' // Ensure the path to the storage file is correct
+  storage: './database/database.sqlite', // Ensure the path to the storage file is correct
+  logging : process.env.SEQUELIZE_LOGGING === 'true'
 });
 
 // Import model definition functions from model files

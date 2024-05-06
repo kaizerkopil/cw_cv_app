@@ -7,6 +7,25 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light d-flex align-items-center" style="height: 100vh;">
+    <!-- Modal for displaying messages -->
+  <% if (messages && messages.length > 0) { %>
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="loginModalLabel">Notification</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <%= messages.join('<br>') %> <!-- Join messages if array -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% } %>
 
   <div class="container">
     <div class="row justify-content-center">
@@ -39,6 +58,16 @@
     </div>
   </div>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Script to show modal if messages exist -->
+  <% if (messages && messages.length > 0) { %>
+    <script>
+      $(document).ready(function() {
+        $('#loginModal').modal('show');
+      });
+    </script>
+  <% } %>
 </body>
 </html>
