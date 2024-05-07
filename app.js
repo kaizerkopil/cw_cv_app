@@ -8,6 +8,7 @@ const path = require("path");
 const multer = require("multer");
 const session = require("express-session");
 const flash = require("connect-flash");
+const { Op } = require("sequelize");
 
 //#region requiring local files
 const custom_bs = require("./utils/browserSync");
@@ -43,15 +44,19 @@ app.use("/utils", express.static("./utils"));
 //configuring session
 app.use(
   session({
-    secret: "AX_100", // secret key to sign the session ID cookie
+    secret: "cv_app_kopil_haider_0101", // secret key to sign the session ID cookie
     saveUninitialized: true,
     resave: false,
+    cookie : { maxAge : 30 * 60 * 1000 } // 30 min
   })
 );
 app.use(flash());
 
 //setting the view engine
 app.set("view engine", "ejs");
+
+//global variables
+let currentUserId;
 
 // Define a dummy user object (replace with data from your database)
 const user = {
@@ -70,29 +75,43 @@ const jobPosts = require("./public/js/dummyJobPosts");
 
 //home page route
 app.get("/", (req, res) => {
-  let currentUser = "agency";
-  if (currentUser === "jobseeker") {
-    res.redirect("/jobseeker");
-  } else {
-    req.query.id = 2;
-    req.query.name = "jack";
-    req.query.location = "wimbley";
-    let queryString = new URLSearchParams(req.query).toString();
-    console.log(`queryString : ${queryString}`);
-    res.redirect("/agency?" + queryString);
-  }
-  //res.render("home", req.query);
+  res.redirect('/login');
 });
 
 //agency home page route
-app.get("/agency", (req, res) => {
-  let message = "User have been saved";
-  res.render("home_agency", { query: req.query, message: message });
+app.get("/agency", async (req, res) => {
+  //assigning currentUserId from session storage stored at login page
+  if(req.session.currentUserId){
+    currentUserId = req.session.currentUserId;
+  }
+
+  let getUser = await User.findOne({
+    where : {
+      id : currentUserId
+    },
+    include : [Agency]
+  })
+
+  console.log(`fetchedAgency: ${JSON.stringify(getUser, null, 2)}`);
+  res.render("home_agency", { item : getUser });
 });
 
 //jobseeker home page route
-app.get("/jobseeker", (req, res) => {
-  res.render("home_jobseeker", req.query);
+app.get("/jobseeker", async (req, res) => {
+  //assigning currentUserId from session storage stored at login page
+  if(req.session.currentUserId){
+    currentUserId = req.session.currentUserId;
+  }
+
+  let getUser = await User.findOne({
+    where : {
+      id : currentUserId
+    },
+    include : [JobSeeker]
+  })
+
+  console.log(`fetchedJobSeeker: ${JSON.stringify(getUser, null, 2)}`);
+  res.render("home_jobseeker", { item : getUser });
 });
 
 //getJobPosts for jobSeekers
@@ -199,98 +218,225 @@ app.post(
 
 //login Page
 app.get("/login", (req, res) => {
-  let messages = req.flash("success");
-  console.log("redirected from register page: " + messages);
-  res.render("login", { messages: messages });
+  let loginErrorMessage = req.flash("loginErrorMessage");
+  let regMessage = req.flash("success");
+  console.log("redirected from register page: " + regMessage);
+  res.render("login", {
+    registrationMessage: regMessage,
+    loginErrorMessage: loginErrorMessage,
+  });
+});
+
+app.post("/login", async (req, res) => {
+  let email = String(req.body.email).trim();
+  let password = String(req.body.password).trim();
+  console.log(`email: ${email}, pass: ${password}`);
+
+  console.log("Performing User.findAll");
+  let validUser = await User.findOne({
+    where: {
+      [Op.and]: [{ email: email }, { password: password }],
+    },
+  });
+  console.log(`validUser: ${JSON.stringify(validUser, null, 2)}`);
+  console.log(`Printed the value of validUser done.........`)
+  if (validUser) {
+    //login success redirect to home_jobseeker
+    console.log("user with email:" + email + ", password: " + password + " is found and is valid")
+    req.session.currentUserId = validUser.id;
+    if(validUser.userType === 'jobseeker')  {
+      console.log("redirecting to '/jobseeker'");
+      res.redirect('/jobseeker');
+    }  
+    else if (validUser.userType === 'agency'){
+      console.log("redirecting to '/agency'");
+      res.redirect('/agency');
+    };
+  } else {
+    //give error message
+    req.flash("loginErrorMessage", "");
+    req.flash(
+      "loginErrorMessage",                                                          666676
+      `User with emai: ${email} and  password: ${password} have not been found`
+    );
+    res.redirect("login")
+  }
 });
 
 // #region Register Page for JobSeeker
 app.get("/registerJobSeeker", (req, res) => {
-  res.render("registerJobSeeker");
+  let initialFormData = {
+    userType: "jobseeker",
+    email: "",
+    password: "",
+    name: "",
+    location: "",
+    occupation: "",
+  };
+
+  res.render("registerJobSeeker", {
+    showValidation: false,
+    formData: initialFormData,
+  });
 });
 
 app.post("/registerJobSeeker", upload.single("cv"), async (req, res) => {
-  
-  let { userType, name, email, password, jobtitle, occupation, location } = req.body;
+  let { userType, name, email, password, jobtitle, occupation, location } =
+    req.body;
+
   let cv = req.file; // multer provides the file info in req.file
   let skills = "";
 
   if (Array.isArray(req.body.skills)) {
     skills = req.body.skills.join(",");
-  }else{ skills = String(req.body.skills);  }
+  } else {
+    skills = String(req.body.skills);
+  }
+
+  let savedFormData = {
+    userType: userType,
+    name: name,
+    email: email,
+    password: "",
+    location: location,
+    occupation: occupation,
+  };
 
   //capturing user data
   let userData = {
-    userType : userType,
+    userType: userType,
     email: email,
-    password: password
-  }
-
-  //saving user data to database to get generated id
-  let savedUser = await User.create(userData);
-
-  //creating jobseeker object to save
-  let jobseeker = {
-    name: name,
-    location: location,
-    occupation: occupation,
-    cv: cv ? cv.originalname : "No file uploaded",
-    skills: skills,
-    UserId : savedUser.id
+    password: password,
   };
 
-  // saving jobseeker to database
-  await JobSeeker.create(jobseeker);
-  console.log(`${jobseeker.name} have been saved to the database`)
-  // Render login view and pass the messages (empty if none)
-  req.flash(
-    "success",
-    "Registration for JobSeeker has been successful. Please try to log in now"
-  );
-  res.redirect("login");
+  let emailExist = await User.findOne({
+    where: {
+      email: userData.email,
+    },
+  });
+
+  if (emailExist) {
+    let msg = "Email has been taken. Please choose a different email";
+    res.render("registerJobSeeker", {
+      showValidation: true,
+      emailErrorMsg: msg,
+      formData: savedFormData,
+    });
+  } else {
+    //saving user data to database to get generated id
+    let savedUser = await User.create(userData);
+
+    //creating jobseeker object to save
+    let jobseeker = {
+      name: name,
+      location: location,
+      occupation: occupation,
+      cv: cv ? cv.originalname : "No file uploaded",
+      skills: skills,
+      UserId: savedUser.id,
+    };
+
+    // saving jobseeker to database
+    await JobSeeker.create(jobseeker);
+    console.log(`${jobseeker.name} have been saved to the database`);
+    // Render login view and pass the messages (empty if none)
+    req.flash(
+      "success",
+      "Your registration has been successful. Please try to log in now"
+    );
+    res.redirect("login");
+  }
 });
 
 // #endregion
 
 // #region RegisterPage for Agency
 app.get("/registerAgency", (req, res) => {
-  res.render("registerAgency");
+  let initialFormData = {
+    userType: "agency",
+    email: "",
+    password: "",
+    name: "",
+    phonenum: "",
+    address: "",
+    description: "",
+    location: "",
+  };
+  res.render("registerAgency", {
+    showValidation: false,
+    formData: initialFormData,
+  });
 });
 
 app.post("/registerAgency", upload.none(), async (req, res) => {
-  let { userType, name, email, password, phonenum, address, description, location } = req.body;
+  let {
+    userType,
+    name,
+    email,
+    password,
+    phonenum,
+    address,
+    description,
+    location,
+  } = req.body;
 
-  //capturing userdata
-  let userData = {
-    userType : userType,
+  let savedFormData = {
+    userType: "agency",
     email: email,
-    password: password
-  }
-
-  //saving userdata to database to generate primaryKey id
-  let savedUser = await User.create(userData);
-  console.log(`savedUserAgency: ${JSON.stringify(savedUser, null, 2)}`);
-
-  //creating agency object to be saved to database
-  let agency = {
+    password: password,
     name: name,
     phonenum: phonenum,
     address: address,
     description: description,
     location: location,
-    UserId : savedUser.id
   };
 
-  // saving agency to database
-  await Agency.create(agency);
-  console.log(`${agency.name} have been saved to the database`)
-  // Render login view and pass the messages (empty if none)
-  req.flash('success', '');
-  req.flash(
-    "success",
-    "Registration for Agency has been successful. Please try to log in now"
-  );
-  res.redirect("login");
+  //capturing userdata
+  let userData = {
+    userType: userType,
+    email: email,
+    password: password,
+  };
+
+  let emailExist = await User.findOne({
+    where: {
+      email: email,
+    },
+  });
+
+  if (emailExist) {
+    let msg = "Email has been taken. Please choose a different email";
+    res.render("registerJobSeeker", {
+      showValidation: true,
+      emailErrorMsg: msg,
+      formData: savedFormData,
+    });
+  } else {
+    //saving userdata to database to generate primaryKey id
+    let savedUser = await User.create(userData);
+    console.log(`savedUserAgency: ${JSON.stringify(savedUser, null, 2)}`);
+
+    //creating agency object to be saved to database
+    let agency = {
+      name: name,
+      phonenum: phonenum,
+      address: address,
+      description: description,
+      location: location,
+      UserId: savedUser.id,
+    };
+
+    // saving agency to database
+    await Agency.create(agency);
+    console.log(`${agency.name} have been saved to the database`);
+    // Render login view and pass the messages (empty if none)
+    req.flash("success", "");
+    req.flash(
+      "success",
+      "Registration for Agency has been successful. Please try to log in now"
+    );
+    res.redirect("login");
+  }
 });
 // #endregion
 
@@ -309,13 +455,6 @@ app.get("/agencyProfile", (req, res) => {
   res.render("agencyProfile", { agency });
 });
 
-// login page post route
-app.post("/login", (req, res) => {
-  console.log(req.body);
-  const { email, password } = req.body; // Extract email and password from form submission
-
-  res.redirect("/");
-});
 // POST route for job posting form
 app.post("/post-job", (req, res) => {
   const { title, pay, location, skills, description } = req.body;
@@ -382,12 +521,25 @@ app.get("/applications", async (req, res) => {
 
 // #endregion
 
+app.get('/logout', (req, res) => {
+  const sessionId = req.sessionID;
+  req.session.destroy(err => {
+    if (err) {
+      return res.status(500).send('Failed to destroy session');
+    }
+    console.log('session has been destroyed: ' + sessionId);
+    res.redirect('login');
+  });
+})
+
 app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
 
   //Environment check whether to sync and seed
-  console.log(`process.env.SEED_SYNC_DATABASE: ${process.env.SEED_SYNC_DATABASE}`)
-  if (process.env.SEED_SYNC_DATABASE === 'true') {
+  console.log(
+    `process.env.SEED_SYNC_DATABASE: ${process.env.SEED_SYNC_DATABASE}`
+  );
+  if (process.env.SEED_SYNC_DATABASE === "true") {
     try {
       // Synchronize database
       await sequelize.sync({ force: true });

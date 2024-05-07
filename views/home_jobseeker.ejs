@@ -1,7 +1,18 @@
 <%- include('./layouts/header_jobseeker.ejs') %>
 <main>
-  <div class="container mt-2 text-center">
-    <h1>The Home page for JOBSEEKER</h1>
+  <div class="d-flex container py-2 justify-content-end">
+    <div class="row pt-2 text-black text-end bg-dark-subtle rounded-2 w-50">
+      <p class="mb-0">Welcome! </p>
+      <p class="fst-italic fw-bold border-bottom border-black pb-1"><%= item.email %></p>
+      <p class="mb-2">Name: <span class="fw-semibold"><%= item.JobSeeker.name %></span></p>
+      <p class="mb-2">Skills: <span class="fw-semibold"><%= item.JobSeeker.skills %></span></p>
+      <p class="mb-2">CV: <span class="fw-semibold"><%= item.JobSeeker.cv %></span></p>
+      <p class="mb-2">Occupation: <span class="fw-semibold"><%= item.JobSeeker.occupation %></span></p>
+      <p>Location: <span class="fw-semibold"><%= item.JobSeeker.location %></span></p>
+    </div>
   </div>
+    <div class="container bg-danger h-25 w-100">
+      <label> hello </label>
+    </div>
 </main>
 <%- include('./layouts/footer.ejs') %>

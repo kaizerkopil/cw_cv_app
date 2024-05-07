@@ -12,32 +12,37 @@
 <body class="bg-light d-flex align-items-center vh-100">
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col-md-8">
+      <div class="col-md-12 col-lg-8">
         <div class="card shadow">
           <div class="card-body p-5 rounded">
-            <h3 class="mb-5 text-center">Register new JobSeeker</h3>
+            <h3 class="mb-5 text-center">Register JobSeeker</h3>
             <form action="/registerJobSeeker" method="POST" enctype="multipart/form-data">
               <input type="hidden" name="userType" id="inputUserType">
               
               <div class="form-floating mb-4">
-                <input type="text" class="form-control" id="nameInput" name="name" placeholder="Name" required>
+                <input type="text" class="form-control" id="nameInput" name="name" placeholder="Name" value="<%= formData.name %>" required>
                 <label for="nameInput">Name</label>
               </div>
 
-              <div class="form-floating mb-4">
-                <input type="email" class="form-control" id="emailInput" name="email" placeholder="Email" required>
+              <div class="form-floating">
+                <input type="email" class="form-control" id="emailInput" name="email" value="<%= formData.email %>" placeholder="Email" required>
                 <label for="emailInput">Email</label>
               </div>
+              <% if(showValidation != null && showValidation === true){ %>
+              <div class="row">
+              <label class="col text-danger"><%= emailErrorMsg %></label>
+              </div>
+              <% } %>
 
-              <div class="form-floating mb-4">
-                <input type="password" class="form-control" id="passwordInput" name="password" placeholder="Password"
+              <div class="form-floating mt-4 mb-4">
+                <input type="password" class="form-control" id="passwordInput" name="password" value="<%= formData.password %>" placeholder="Password"
                   required>
                 <label for="passwordInput">Password</label>
               </div>
 
-              <div class="mb-4">
+              <div class="row mb-4">
                 <label for="skillsInput">Skills</label>
-                <select class="form-control select2-multiple" id="skillsInput" name="skills" multiple required> 
+                <select class="form-control select2-multiple col" id="skillsInput" name="skills" multiple required> 
                   <option value="JavaScript">JavaScript</option>
                   <option value="Python">Python</option>
                   <option value="Java">Java</option>
@@ -49,7 +54,7 @@
 
               <div class="mb-4">
                 <label for="location">Location</label>
-                <select class="form-control select2" id="location" name="location" required>
+                <select class="form-control select2" id="location" name="location" value="<%= formData.location %>" required>
                   <option value="London">London</option>
                   <option value="Kingston">Kingston</option>
                   <option value="Leicester">Leicester</option>
@@ -59,7 +64,7 @@
               </div>
 
               <div class="form-floating mb-4">
-                <input type="text" class="form-control" id="occupation" name="occupation" placeholder="job Title" required>
+                <input type="text" class="form-control" id="occupation" name="occupation" value="<%= formData.occupation %>" placeholder="job Title" required>
                 <label for="occupation">Job Title</label>
               </div>
 

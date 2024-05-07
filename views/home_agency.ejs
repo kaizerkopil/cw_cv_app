@@ -1,10 +1,17 @@
 <%- include('./layouts/header_agency.ejs') %>
 <main>
-  <% if(message && message.length > 0){%>
-    <div class="alert alert-info"><%= message %></div>
-  <% } %>
-  <div class="container mt-2 text-center">
-    <h1>The Home page for AGENCY</h1>
+  <div class="d-flex container py-2 justify-content-end">
+    <div class="row pt-2 text-black text-end bg-dark-subtle rounded-2 w-50">
+      <p class="mb-0">Welcome! </p>
+      <p class="fst-italic fw-bold border-bottom border-black pb-1"><%= item.email %></p>
+      <p class="mb-2">Name: <span class="fw-semibold"><%= item.Agency.name %></span></p>
+      <p class="mb-2">Mobile: <span class="fw-semibold"><%= item.Agency.phonenum %></span></p>
+      <p class="mb-2">Address: <span class="fw-semibold"><%= item.Agency.address %></span></p>
+      <p>Location: <span class="fw-semibold"><%= item.Agency.location %></span></p>
+    </div>
+  </div>
+  <div class="container bg-danger h-25 w-100">
+    <label> hello </label>
   </div>
 </main>
 <%- include('./layouts/footer.ejs') %>
