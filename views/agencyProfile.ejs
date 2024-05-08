@@ -30,9 +30,10 @@
       <div class="mb-4">
         <h3 class="mt-4 mb-3">Job Postings</h3>
         <% if(successMessage) { %>
-        <div class="alert alert-success" role="alert">
-          <%= successMessage %>
-        </div>
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <%= successMessage %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
         <% } %> <% if(user.Agency && user.Agency.Jobs && user.Agency.Jobs.length
         > 0) { %>
         <ul class="list-group">
