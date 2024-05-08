@@ -47,7 +47,7 @@ app.use(
     secret: "cv_app_kopil_haider_0101", // secret key to sign the session ID cookie
     saveUninitialized: true,
     resave: false,
-    cookie : { maxAge : 30 * 60 * 1000 } // 30 min
+    cookie: { maxAge: 30 * 60 * 1000 }, // 30 min
   })
 );
 app.use(flash());
@@ -59,15 +59,15 @@ app.set("view engine", "ejs");
 let currentUserId;
 
 // Define a dummy user object (replace with data from your database)
-const user = {
-  name: "John Doe",
-  email: "john@example.com",
-  skills: "JavaScript, HTML, CSS",
-  number: "03203210",
-  location: "london",
-  occupation: "Web Developer",
-  cv: "/img/CV.pdf", // Path to the uploaded CV file
-};
+// const user = {
+//   name: "John Doe",
+//   email: "john@example.com",
+//   skills: "JavaScript, HTML, CSS",
+//   number: "03203210",
+//   location: "london",
+//   occupation: "Web Developer",
+//   cv: "/img/CV.pdf", // Path to the uploaded CV file
+// };
 const agency = require("./public/js/dummyDataAgency");
 const jobPosts = require("./public/js/dummyJobPosts");
 
@@ -75,59 +75,68 @@ const jobPosts = require("./public/js/dummyJobPosts");
 
 //home page route
 app.get("/", (req, res) => {
-  res.redirect('/login');
+  res.redirect("/login");
 });
 
 //agency home page route
 app.get("/agency", async (req, res) => {
   //assigning currentUserId from session storage stored at login page
-  if(req.session.currentUserId){
+  if (req.session.currentUserId) {
     currentUserId = req.session.currentUserId;
   }
 
   let getUser = await User.findOne({
-    where : {
-      id : currentUserId
+    where: {
+      id: currentUserId,
     },
-    include : [Agency]
-  })
+    include: [Agency],
+  });
 
   console.log(`fetchedAgency: ${JSON.stringify(getUser, null, 2)}`);
-  res.render("home_agency", { item : getUser });
+  res.render("home_agency", { item: getUser });
 });
 
 //jobseeker home page route
 app.get("/jobseeker", async (req, res) => {
   //assigning currentUserId from session storage stored at login page
-  if(req.session.currentUserId){
+  if (req.session.currentUserId) {
     currentUserId = req.session.currentUserId;
   }
 
   let getUser = await User.findOne({
-    where : {
-      id : currentUserId
+    where: {
+      id: currentUserId,
     },
-    include : [JobSeeker]
-  })
+    include: [JobSeeker],
+  });
 
   console.log(`fetchedJobSeeker: ${JSON.stringify(getUser, null, 2)}`);
-  res.render("home_jobseeker", { item : getUser });
+  res.render("home_jobseeker", { item: getUser });
 });
 
 //getJobPosts for jobSeekers
-app.get("/getJobPosts", (req, res) => {
+app.get("/getJobPosts", async (req, res) => {
+  const jobPosts = await Job.findAll();
+  console.log(jobPosts);
   res.render("getJobPosts", { items: jobPosts });
 });
 
-// Route to show job post details
-app.get("/job-post/:id", (req, res) => {
-  const jobId = req.params.id;
-  const job = jobPosts.find((job) => job.id === parseInt(jobId));
-  if (!job) {
-    res.status(404).send("Job post not found");
-    return;
+// // Route to show job post details
+app.get("/job-post/:id", async (req, res) => {
+  try {
+    const jobId = req.params.id;
+    const job = await Job.findByPk(jobId);
+
+    if (!job) {
+      res.status(404).send("Job post not found");
+      return;
+    }
+
+    res.render("jobPostDetail", { job });
+  } catch (error) {
+    console.error("Error fetching job post:", error);
+    res.status(500).send("Error fetching job post");
   }
-  res.render("jobPostDetail", { job });
 });
 
 //contactUs Page
@@ -239,27 +248,32 @@ app.post("/login", async (req, res) => {
     },
   });
   console.log(`validUser: ${JSON.stringify(validUser, null, 2)}`);
-  console.log(`Printed the value of validUser done.........`)
+  console.log(`Printed the value of validUser done.........`);
   if (validUser) {
     //login success redirect to home_jobseeker
-    console.log("user with email:" + email + ", password: " + password + " is found and is valid")
+    console.log(
+      "user with email:" +
+        email +
+        ", password: " +
+        password +
+        " is found and is valid"
+    );
     req.session.currentUserId = validUser.id;
-    if(validUser.userType === 'jobseeker')  {
+    if (validUser.userType === "jobseeker") {
       console.log("redirecting to '/jobseeker'");
-      res.redirect('/jobseeker');
-    }  
-    else if (validUser.userType === 'agency'){
+      res.redirect("/jobseeker");
+    } else if (validUser.userType === "agency") {
       console.log("redirecting to '/agency'");
-      res.redirect('/agency');
-    };
+      res.redirect("/agency");
+    }
   } else {
     //give error message
     req.flash("loginErrorMessage", "");
     req.flash(
-      "loginErrorMessage",                                                          666676
-      `User with emai: ${email} and  password: ${password} have not been found`
+      "loginErrorMessage",
+      666676`User with emai: ${email} and  password: ${password} have not been found`
     );
-    res.redirect("login")
+    res.redirect("login");
   }
 });
 
@@ -440,30 +454,117 @@ app.post("/registerAgency", upload.none(), async (req, res) => {
 });
 // #endregion
 
-//Profile Page for job seekers
-app.get("/jobSeekerProfile", (req, res) => {
-  res.render("jobSeekerProfile", { user });
+// Get request for Job post page
+app.get("/uploadJobPost", async (req, res) => {
+  const successMessage = req.flash("successMessage")[0]; // Get the first success message if it exists
+
+  res.render("uploadJobPost", { successMessage: successMessage || null });
+});
+
+// Profile Page for job seekers
+app.get("/jobSeekerProfile", async (req, res) => {
+  if (req.session.currentUserId) {
+    currentUserId = req.session.currentUserId;
+  }
+
+  try {
+    // Fetch user data including associated JobSeeker data
+    let getUser = await User.findOne({
+      where: {
+        id: currentUserId,
+      },
+      include: [JobSeeker],
+    });
+
+    if (getUser) {
+      // User found, render the page with user data
+      res.render("jobSeekerProfile", { user: getUser });
+    } else {
+      // User not found, handle the error or redirect to an error page
+      res.status(404).send("User not found");
+    }
+  } catch (error) {
+    // Handle any errors that occur during the database query
+    console.error("Error fetching user data:", error);
+    res.status(500).send("Error fetching user data");
+  }
+});
+
+// Recruitment Agency Profile Route
+// Recruitment Agency Profile Route
+app.get("/agencyProfile", async (req, res) => {
+  try {
+    // Assuming you have a way to retrieve the current user's ID from the session
+    const currentUserId = req.session.currentUserId;
+
+    // Fetch the user data along with their associated agency and job postings
+    const user = await User.findOne({
+      where: {
+        id: currentUserId,
+      },
+      include: {
+        model: Agency,
+        include: Job, // Assuming you have a model named Job for job postings
+      },
+    });
+
+    // If the user or agency is not found, handle appropriately
+
+    // Pass the user data to the agencyProfile template
+    const successMessage = req.flash("successMessage")[0]; // Get the first success message if it exists
+
+    res.render("agencyProfile", {
+      user,
+      successMessage: successMessage || null,
+    });
+  } catch (error) {
+    console.error("Error fetching agency profile:", error);
+    // Render an error page or redirect to an appropriate route
+    //res.render("errorPage", { errorMessage: "Error fetching agency profile" });
+  }
 });
 
 //Upload Job Post for recruitment Agency
-app.get("/uploadJobPost", (req, res) => {
-  res.render("uploadJobPost", { user });
+app.post("/post-job", async (req, res) => {
+  try {
+    // Extract job details from the form submission
+    const { title, pay, location, skills, description } = req.body;
+
+    // Get the user's information along with their associated agency
+    const currentUserId = req.session.currentUserId;
+    const getUser = await User.findOne({
+      where: {
+        id: currentUserId,
+      },
+      include: [Agency],
+    });
+
+    // Extract the agency's name from the user's information
+    const companyName = getUser.Agency.name;
+    const AgencyId = getUser.Agency.id;
+
+    //Create the job in the database
+    await Job.create({
+      title,
+      pay,
+      location,
+      skills,
+      description,
+      companyName, // Use the agency's name as the companyName
+      AgencyId, // use the agency's id from the id table
+    });
+
+    // If job creation is successful, redirect back to the form page with a success message
+    req.flash("successMessage", "Job posted successfully!");
+    res.redirect("/uploadJobPost");
+  } catch (error) {
+    // If an error occurs, handle it appropriately
+    console.error("Error posting job:", error);
+    req.flash("errorMessage", "Error posting job. Please try again.");
+    res.redirect("/uploadJobPost");
+  }
 });
 
-//Recruitment Agency Profile
-app.get("/agencyProfile", (req, res) => {
-  res.render("agencyProfile", { agency });
-});
-
-// POST route for job posting form
-app.post("/post-job", (req, res) => {
-  const { title, pay, location, skills, description } = req.body;
-
-  // Save job details to the database (Replace with your database logic)
-
-  // Redirect to a confirmation page or dashboard
-  res.redirect("/dashboard");
-});
 //#endregion
 
 // #region test routes to check all the data is coming from the database correctly
@@ -520,17 +621,89 @@ app.get("/applications", async (req, res) => {
 });
 
 // #endregion
+// #region to update data
 
-app.get('/logout', (req, res) => {
-  const sessionId = req.sessionID;
-  req.session.destroy(err => {
-    if (err) {
-      return res.status(500).send('Failed to destroy session');
+// Server-side route to handle profile updates for job seekers
+app.post("/edit-profile", async (req, res) => {
+  try {
+    const userId = req.session.currentUserId;
+    const { name, location, occupation, skills } = req.body;
+
+    // Update the job seeker's profile information in the database
+    await JobSeeker.update(
+      { name, location, occupation, skills },
+      { where: { UserId: userId } }
+    );
+
+    res.redirect("/jobSeekerProfile"); // Redirect to the profile page after editing
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).send("Error updating profile");
+  }
+});
+
+// Define a route to handle the POST request for editing job posts
+app.post("/edit-job/:jobId", async (req, res) => {
+  const jobId = req.params.id;
+
+  try {
+    // Find the job by ID and delete it
+    const deletedJob = await Job.destroy({
+      where: { id: jobId },
+    });
+
+    // Check if the job was successfully deleted
+    if (deletedJob) {
+      req.flash("successMessage", "Job deleted successfully");
+      res.status(200).send("Job deleted successfully");
+    } else {
+      req.flash("errorMessage", "Job not found");
+      res.status(404).send("Job not found");
     }
-    console.log('session has been destroyed: ' + sessionId);
-    res.redirect('login');
+  } catch (error) {
+    console.error("Error deleting job:", error);
+    req.flash("errorMessage", "Error deleting job");
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// Assuming you have required necessary modules like express, sequelize, and models
+
+// Define the route handler for deleting job posts
+app.post("/delete-job/:jobId", async (req, res) => {
+  try {
+    const jobId = req.params.jobId;
+
+    // Find the job in the database by its ID
+    const job = await Job.findByPk(jobId);
+
+    // If the job is not found, return an error response
+    if (!job) {
+      return res.status(404).send("Job not found");
+    }
+
+    // Delete the job from the database
+    await job.destroy();
+
+    // Flash success message and redirect
+    req.flash("successMessage", "Job deleted successfully!");
+    res.redirect("/agencyProfile"); // Redirect to the appropriate page
+  } catch (error) {
+    console.error("Error deleting job:", error);
+    res.status(500).send("Error deleting job");
+  }
+});
+
+app.get("/logout", (req, res) => {
+  const sessionId = req.sessionID;
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).send("Failed to destroy session");
+    }
+    console.log("session has been destroyed: " + sessionId);
+    res.redirect("login");
   });
-})
+});
 
 app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);

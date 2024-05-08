@@ -2,17 +2,13 @@
 <main class="container mt-5">
   <div class="row justify-content-center">    
     <div class="col-md-8">
-      <h1 class="card-title mb-4"><%= agency.name %></h1>
+      <h1 class="card-title mb-4"><%= user.Agency.name %></h1>
       <div class="card">
         <div class="card-body">          
           <div class="row mb-3">
             <div class="col-md-6">              
-              <p>Email: <%= agency.email %></p>
-              <p>Phone Number: <%= agency.number %></p>
-              <p>Location: <%= agency.location %></p>
-              <p>Company Name: <%= agency.companyName %></p>
-              <p>Company Address: <%= agency.address %></p>
-              <p>Company Description: <%= agency.companyDescription %></p>
+              <p>Email: <%= user.email %></p>
+              <!-- Add other agency details here -->
             </div>            
           </div>           
           <div >
@@ -22,20 +18,53 @@
       </div>
       <div class="mb-4">
         <h3 class="mt-4 mb-3">Job Postings</h3>
-        <% if(agency.jobPostings.length > 0) { %>
+        <% if(successMessage) { %>
+          <div class="alert alert-success" role="alert">
+            <%= successMessage %>
+          </div>
+        <% } %>
+        <% if(user.Agency && user.Agency.Jobs && user.Agency.Jobs.length > 0) { %>
           <ul class="list-group">
-            <% agency.jobPostings.forEach(job => { %>
+            <% user.Agency.Jobs.forEach(job => { %>
               <li class="list-group-item">
                 <h5><%= job.title %></h5>
                 <p><strong>Pay:</strong> <%= job.pay %></p>
                 <p><strong>Location:</strong> <%= job.location %></p>
                 <p><strong>Skills Required:</strong> <%= job.skills %></p>
                 <p><strong>Description:</strong> <%= job.description %></p>
+                <!-- Add edit and delete buttons for each job posting -->
                 <div class="btn-group">
-                  <a href="/edit-job/<%= job.id %>" class="btn btn-primary me-2">Edit</a>
-                  <a href="/delete-job/<%= job.id %>" class="btn btn-danger">Delete</a>
+                  <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editJobModal<%= job.id %>">Edit</button>
+                  <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteJobModal<%= job.id %>">Delete</button>
                 </div>
               </li>
+
+              <!-- Edit Job Modal -->
+              <div class="modal fade" id="editJobModal<%= job.id %>" tabindex="-1" aria-labelledby="editJobModalLabel<%= job.id %>" aria-hidden="true">
+                <!-- Modal content for editing job -->
+              </div>
+
+            <!-- Delete Job Modal -->
+            <div class="modal fade" id="deleteJobModal<%= job.id %>" tabindex="-1" aria-labelledby="deleteJobModalLabel<%= job.id %>" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="deleteJobModalLabel<%= job.id %>">Delete Job</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p>Are you sure you want to delete this job post?</p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form action="/delete-job/<%= job.id %>" method="POST">
+                      <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <% }) %>
           </ul>
         <% } else { %>

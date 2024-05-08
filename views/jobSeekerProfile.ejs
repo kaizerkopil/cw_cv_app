@@ -2,28 +2,27 @@
 <main class="container mt-5">
   <div class="row justify-content-center">    
     <div class="col-md-8">
-      <h1 class="card-title mb-4"><%= user.name %></h1>
+      <h1 class="card-title mb-4"><%= user.JobSeeker.name %></h1>
       <div class="card">
         <div class="card-body">          
           <div class="row mb-3">
             <div class="col-md-6">              
-              <p>Email: <%= user.email %></p>
-              <p>Phone Number: <%= user.number %></p>
-              <p>Location: <%= user.location %></p>
-              <p>Job Title: <%= user.occupation %></p>
-              <p>Skills: <%= user.skills %></p>
+              <p>Email: <%= user.email %></p>              
+              <p>Location: <%= user.JobSeeker.location %></p>
+              <p>Job Title: <%= user.JobSeeker.occupation %></p>
+              <p>Skills: <%= user.JobSeeker.skills %></p>
             </div>            
           </div>           
           <div >
-            <a href="/edit-profile" class="btn btn-warning me-2">Edit Profile</a>
+            <a href="#" class="btn btn-warning me-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</a>
           </div>          
         </div>        
       </div>
       <div class="mb-4">
-        <% if(user.cv) { %>
+        <% if(user.JobSeeker.cv) { %>
             <h5>CV:</h5>
-            <% if(user.cv.endsWith('.pdf')) { %>
-              <embed src="<%= user.cv %>" width="500" height="375" type="application/pdf">
+            <% if(user.JobSeeker.cv.endsWith('.pdf')) { %>
+              <!-- <embed src="<%= user.JobSeeker.cv %>" width="500" height="375" type="application/pdf"> -->
             <% } else { %>
               <p><%= user.cv %></p>
             <% } %>
@@ -106,5 +105,42 @@
     </div>
   </div>
 </div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="/edit-profile" method="POST">
+          <div class="mb-3">
+            <label for="nameInput" class="form-label">Name</label>
+            <input type="text" class="form-control" id="nameInput" name="name" value="<%= user.JobSeeker.name %>" required>
+          </div>
+          <div class="mb-3">
+            <label for="locationInput" class="form-label">Location</label>
+            <input type="text" class="form-control" id="locationInput" name="location" value="<%= user.JobSeeker.location %>" required>
+          </div>
+          <div class="mb-3">
+            <label for="occupationInput" class="form-label">Occupation</label>
+            <input type="text" class="form-control" id="occupationInput" name="occupation" value="<%= user.JobSeeker.occupation %>" required>
+          </div>
+          <div class="mb-3">
+            <label for="skillsInput" class="form-label">Skills</label>
+            <input type="text" class="form-control" id="skillsInput" name="skills" value="<%= user.JobSeeker.skills %>" required>
+          </div>
+          <div class="text-end">
+            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <%- include('./layouts/footer') %>
