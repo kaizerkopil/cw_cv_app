@@ -122,6 +122,7 @@ app.get("/getJobPosts", async (req, res) => {
   res.render("getJobPosts", { items: jobPosts });
 });
 
+// showing each job post for JobSeeker in jobPostDetails page
 // // Route to show job post details
 app.get("/job-post/:id", async (req, res) => {
   try {
@@ -147,6 +148,7 @@ app.get("/job-post/:id", async (req, res) => {
   }
 });
 
+//applying for job post by JobSeeker
 app.get("/send-cv/:id", async (req, res) => {
   let userId = req.session.currentUserId;
   let currentUser = await User.findOne({
@@ -675,6 +677,7 @@ app.get("/jobs", async (req, res) => {
 app.get("/applications", async (req, res) => {
   try {
     // Assuming you have access to the current agency's ID
+    console.log(`req.session.currentUserId: ${req.session.currentUserId}`);
     const agencyId = req.session.currentUserId;
 
     const applications = await Application.findAll({
@@ -708,7 +711,64 @@ app.get("/applications", async (req, res) => {
 
     res.render("applications", { applications });
   } catch (error) {
+    console.log("Error retrieving applications: " + error);
     res.status(500).send("Error retrieving applications");
+  }
+});
+
+// Accepting application from 'applications' page
+app.post("/accept-application/:jobId/:jobSeekerId", async (req, res) => {
+  try {
+    let jobId = req.params.jobId;
+    let jobSeekerId = req.params.jobSeekerId;
+    let application = await Application.findOne({
+      where: {
+        [Op.and]: [{ JobId: jobId }, { JobSeekerId: jobSeekerId }],
+      },
+    });
+
+    let result = await Application.update(
+      { statusOfApplication: "Accepted" },
+      {
+        where: {
+          [Op.and]: [{ JobId: jobId }, { JobSeekerId: jobSeekerId }],
+        },
+      }
+    );
+
+    console.log(`Number of rows affected after updating application status to "Accepted": ${result}`);
+    res.redirect("/applications");
+  } catch (error) {
+    console.log(`error accepting application by Agency: ${error}`);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// Rejecting application from 'applications' page
+app.post("/reject-application/:jobId/:jobSeekerId", async (req, res) => {
+  try {
+    let jobId = req.params.jobId;
+    let jobSeekerId = req.params.jobSeekerId;
+    console.log(`jobId: ${jobId}, jobSeekerId: ${jobSeekerId}`);
+
+    let application = await Application.findOne({
+      where: {
+        [Op.and]: [{ JobId: jobId }, { JobSeekerId: jobSeekerId }],
+      },
+    });
+    let result = await Application.update(
+      { statusOfApplication: "Rejected" },
+      {
+        where: {
+          [Op.and]: [{ JobId: jobId }, { JobSeekerId: jobSeekerId }],
+        },
+      }
+    );
+    console.log(`Number of rows affected after updating application status to "Rejected": ${result}`);
+    res.redirect("/applications");
+  } catch (error) {
+    console.log(`Error rejecting application by Agency: ${error}`);
+    res.status(500).send("Internal Server Error");
   }
 });
 

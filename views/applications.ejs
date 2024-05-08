@@ -1,31 +1,96 @@
 <%- include('./layouts/header_agency') %>
-<main class="container mt-5">
-  <div class="row justify-content-center">    
-    <div class="col-md-8">
-      <h1 class="mb-4">Applications</h1>
-      <ul class="list-group">
-        <% applications.forEach(application => { %>
-          <li class="list-group-item">
-            <h5><%= application.JobSeeker.name %></h5>
-            <p><strong>Location:</strong> <%= application.JobSeeker.location %></p>
-            <p><strong>Occupation:</strong> <%= application.JobSeeker.occupation %></p>
-            <p><strong>Skills:</strong> <%= application.JobSeeker.skills %></p>
-            <p><strong>CV:</strong> <%= application.JobSeeker.cv %></p>
-            <p><strong>Status:</strong> <%= application.statusOfApplication %></p>
-            <div class="d-flex gap-2">
-              <% if (application.statusOfApplication === 'Pending') { %>
-                <form action="/accept-application/<%= application.JobId %>" method="POST">
-                  <button type="submit" class="btn btn-success">Accept</button>
-                </form>
-                <form action="/reject-application/<%= application.JobId %>" method="POST">
-                  <button type="submit" class="btn btn-danger">Reject</button>
-                </form>
-              <% } %>
-            </div>
-          </li>
-        <% }) %>
-      </ul>
+  <main class="container mt-2">
+    <div class="row justify-content-center">
+      <div class="col-md-10">
+        <h1 class="mb-3">Applications</h1>
+        <ul class="list-group gap-3">
+          <% for(let i = 0; i < applications.length; i++){ %>
+            <li class="list-group-item rounded-2 border-2">
+              <div class="container">
+                <% if(applications[i].statusOfApplication === 'Accepted'){ %>
+                <div class="d-flex fw-semibold border-bottom p-2 bg-success-subtle align-items-center gap-2 justify-content-between mb-1 rounded-2">
+                  <span class="fs-4">Application # <%= i %></span>
+                  <span class="fs-6"><strong>Status: </strong> <%= applications[i].statusOfApplication %></span>
+                </div>
+                <% } else if(applications[i].statusOfApplication === 'Rejected'){%>
+                  <div class="d-flex fw-semibold border-bottom p-2 bg-danger-subtle align-items-center gap-2 justify-content-between mb-1 rounded-2">
+                    <span class="fs-4">Application # <%= i %></span>
+                    <span class="fs-6"><strong>Status: </strong> <%= applications[i].statusOfApplication %></span>
+                  </div>
+                <% } else { %>
+                  <div class="d-flex fw-semibold border-bottom p-2 bg-secondary-subtle align-items-center gap-2 justify-content-between mb-1 rounded-2">
+                    <span class="fs-4">Application # <%= i %></span>
+                    <span class="fs-6"><strong>Status: </strong> <%= applications[i].statusOfApplication %></span>
+                  </div>
+                <% } %>
+                <div class="row">
+                  <div class="col-md-6">
+                    <h4 class="lead">Applicant details: </h4>
+                    <h5>
+                      Name: <%= applications[i].JobSeeker.name %>
+                    </h5>
+                    <p><strong>Location:</strong>
+                      <%= applications[i].JobSeeker.location %>
+                    </p>
+                    <p><strong>Occupation:</strong>
+                      <%= applications[i].JobSeeker.occupation %>
+                    </p>
+                    <p><strong>Skills:</strong>
+                      <%= applications[i].JobSeeker.skills %>
+                    </p>
+                    <p><strong>CV:</strong>
+                      <%= applications[i].JobSeeker.cv %>
+                    </p>
+                  </div>
+                  <div class="col-md-6">
+                    <h4 class="lead">Job details: </h4>
+                    <h5>
+                      Title: <%= applications[i].Job.title %>
+                    </h5>
+                    <p><strong>Salary:</strong>
+                      <%= applications[i].Job.pay %>
+                    </p>
+                    <p><strong>Company:</strong>
+                      <%= applications[i].Job.companyName %>
+                    </p>
+                    <p><strong>Job Location:</strong>
+                      <%= applications[i].Job.jobLocation %>
+                    </p>
+                    <p><strong>Skills Required:</strong>
+                      <%= applications[i].Job.skillsRequired %>
+                    </p>
+                    <p><strong>Description:</strong>
+                      <%= applications[i].Job.description %>
+                    </p>
+                  </div>
+                </div>
+                <div class="d-flex gap-2">
+                  <% if (applications[i].statusOfApplication==='Pending' ) { %>
+                    <form action="/accept-application/<%= applications[i].JobId %>/<%= applications[i].JobSeekerId %>"
+                      method="POST">
+                      <button type="submit" class="btn btn-success">Accept</button>
+                    </form>
+                    <form action="/reject-application/<%= applications[i].JobId %>/<%= applications[i].JobSeekerId %>"
+                      method="POST">
+                      <button type="submit" class="btn btn-danger">Reject</button>
+                    </form>
+                    <% } else if (applications[i].statusOfApplication==='Accepted' ){ %>
+                      <form action="/reject-application/<%= applications[i].JobId %>/<%= applications[i].JobSeekerId %>"
+                        method="POST">
+                        <button type="submit" class="btn btn-danger">Reject</button>
+                      </form>
+                      <% } else if (applications[i].statusOfApplication==='Rejected' ){ %>
+                        <form action="/accept-application/<%= applications[i].JobId %>/<%= applications[i].JobSeekerId %>"
+                          method="POST">
+                          <button type="submit" class="btn btn-success">Accept</button>
+                        </form>
+                      <% } %>
+                </div>
+              </div>        
+            </li>
+            <% } %>
+        </ul>
+      </div>
     </div>
-  </div>
-</main>
-<%- include('./layouts/footer') %>
+  </main>
+  <%- include('./layouts/footer') %>
