@@ -14,5 +14,13 @@ module.exports = (sequelize, DataTypes) => {
     description: {
       type: DataTypes.TEXT,
     },
+    skillsRequired: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    jobLocation: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   });
 };

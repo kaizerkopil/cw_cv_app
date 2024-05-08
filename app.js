@@ -110,7 +110,6 @@ app.get("/jobseeker", async (req, res) => {
     include: [JobSeeker],
   });
 
-  console.log(`fetchedJobSeeker: ${JSON.stringify(getUser, null, 2)}`);
   res.render("home_jobseeker", { item: getUser });
 });
 
@@ -273,7 +272,7 @@ app.post("/login", async (req, res) => {
       "loginErrorMessage",
       666676`User with emai: ${email} and  password: ${password} have not been found`
     );
-    res.redirect("login");
+    res.redirect("/login");
   }
 });
 
@@ -528,7 +527,8 @@ app.get("/agencyProfile", async (req, res) => {
 app.post("/post-job", async (req, res) => {
   try {
     // Extract job details from the form submission
-    const { title, pay, location, skills, description } = req.body;
+    const { title, pay, jobLocation, skillsRequired, description } = req.body;
+    console.log(req.body);
 
     // Get the user's information along with their associated agency
     const currentUserId = req.session.currentUserId;
@@ -547,8 +547,8 @@ app.post("/post-job", async (req, res) => {
     await Job.create({
       title,
       pay,
-      location,
-      skills,
+      jobLocation,
+      skillsRequired,
       description,
       companyName, // Use the agency's name as the companyName
       AgencyId, // use the agency's id from the id table
@@ -611,10 +611,39 @@ app.get("/jobs", async (req, res) => {
 // Route to get all applications
 app.get("/applications", async (req, res) => {
   try {
+    // Assuming you have access to the current agency's ID
+    const agencyId = req.session.currentUserId;
+
     const applications = await Application.findAll({
-      include: [JobSeeker, Job], // This will include JobSeeker and Job data in the results
+      include: [
+        {
+          model: JobSeeker,
+          attributes: [
+            "id",
+            "name",
+            "location",
+            "occupation",
+            "skills",
+            "cv",
+            "UserId",
+          ],
+        },
+        {
+          model: Job,
+          where: { AgencyId: agencyId }, // Filter jobs by agencyId
+          attributes: [
+            "id",
+            "title",
+            "pay",
+            "companyName",
+            "description",
+            "AgencyId",
+          ],
+        },
+      ],
     });
-    res.json(applications);
+
+    res.render("applications", { applications });
   } catch (error) {
     res.status(500).send("Error retrieving applications");
   }
@@ -636,6 +665,25 @@ app.post("/edit-profile", async (req, res) => {
     );
 
     res.redirect("/jobSeekerProfile"); // Redirect to the profile page after editing
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).send("Error updating profile");
+  }
+});
+
+// Server-side route to handle profile updates for agency
+app.post("/edit-profile-agency", async (req, res) => {
+  try {
+    const userId = req.session.currentUserId;
+    const { name, email, phonenum, address, description, location } = req.body;
+
+    // Update the agency's profile information in the database
+    await Agency.update(
+      { name, email, phonenum, address, description, location },
+      { where: { UserId: userId } }
+    );
+    req.flash("successMessage", "Profile updated successfully");
+    res.redirect("/agencyProfile"); // Redirect to the profile page after editing
   } catch (error) {
     console.error("Error updating profile:", error);
     res.status(500).send("Error updating profile");

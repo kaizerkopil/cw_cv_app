@@ -1,0 +1,31 @@
+<%- include('./layouts/header_agency') %>
+<main class="container mt-5">
+  <div class="row justify-content-center">    
+    <div class="col-md-8">
+      <h1 class="mb-4">Applications</h1>
+      <ul class="list-group">
+        <% applications.forEach(application => { %>
+          <li class="list-group-item">
+            <h5><%= application.JobSeeker.name %></h5>
+            <p><strong>Location:</strong> <%= application.JobSeeker.location %></p>
+            <p><strong>Occupation:</strong> <%= application.JobSeeker.occupation %></p>
+            <p><strong>Skills:</strong> <%= application.JobSeeker.skills %></p>
+            <p><strong>CV:</strong> <%= application.JobSeeker.cv %></p>
+            <p><strong>Status:</strong> <%= application.statusOfApplication %></p>
+            <div>
+              <% if (application.statusOfApplication === 'Pending') { %>
+                <form action="/accept-application/<%= application.JobId %>" method="POST">
+                  <button type="submit" class="btn btn-success">Accept</button>
+                </form>
+                <form action="/reject-application/<%= application.JobId %>" method="POST">
+                  <button type="submit" class="btn btn-danger">Reject</button>
+                </form>
+              <% } %>
+            </div>
+          </li>
+        <% }) %>
+      </ul>
+    </div>
+  </div>
+</main>
+<%- include('./layouts/footer') %>
