@@ -143,7 +143,7 @@ app.get("/contactUs", (req, res) => {
   res.render("contactUs");
 });
 
-// #region registerUser Page
+// #region [NOT BEING USED] registerUser Page
 let cust = {
   name: "",
   age: "",
@@ -250,13 +250,7 @@ app.post("/login", async (req, res) => {
   console.log(`Printed the value of validUser done.........`);
   if (validUser) {
     //login success redirect to home_jobseeker
-    console.log(
-      "user with email:" +
-        email +
-        ", password: " +
-        password +
-        " is found and is valid"
-    );
+    console.log(`User with email: ${email} and password: ${password} have been found.`);
     req.session.currentUserId = validUser.id;
     if (validUser.userType === "jobseeker") {
       console.log("redirecting to '/jobseeker'");
@@ -269,8 +263,7 @@ app.post("/login", async (req, res) => {
     //give error message
     req.flash("loginErrorMessage", "");
     req.flash(
-      "loginErrorMessage",
-      666676`User with emai: ${email} and  password: ${password} have not been found`
+      "loginErrorMessage", `User with Email: ${email} and Password: ${password} have not been found`
     );
     res.redirect("/login");
   }
