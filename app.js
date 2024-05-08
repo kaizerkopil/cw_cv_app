@@ -68,8 +68,9 @@ let currentUserId;
 //   occupation: "Web Developer",
 //   cv: "/img/CV.pdf", // Path to the uploaded CV file
 // };
-const agency = require("./public/js/dummyDataAgency");
-const jobPosts = require("./public/js/dummyJobPosts");
+
+//const agency = require("./public/js/dummyDataAgency");
+//const jobPosts = require("./public/js/dummyJobPosts");
 
 //#region Configuring the app routes
 
