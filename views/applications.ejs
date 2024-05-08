@@ -12,7 +12,7 @@
             <p><strong>Skills:</strong> <%= application.JobSeeker.skills %></p>
             <p><strong>CV:</strong> <%= application.JobSeeker.cv %></p>
             <p><strong>Status:</strong> <%= application.statusOfApplication %></p>
-            <div>
+            <div class="d-flex gap-2">
               <% if (application.statusOfApplication === 'Pending') { %>
                 <form action="/accept-application/<%= application.JobId %>" method="POST">
                   <button type="submit" class="btn btn-success">Accept</button>

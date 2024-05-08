@@ -84,6 +84,7 @@ app.get("/agency", async (req, res) => {
   if (req.session.currentUserId) {
     currentUserId = req.session.currentUserId;
   }
+  console.log(`agency logged in with id: ${currentUserId}`);
 
   let getUser = await User.findOne({
     where: {
@@ -102,6 +103,7 @@ app.get("/jobseeker", async (req, res) => {
   if (req.session.currentUserId) {
     currentUserId = req.session.currentUserId;
   }
+  console.log(`jobseeker logged in with id: ${currentUserId}`);
 
   let getUser = await User.findOne({
     where: {
@@ -116,7 +118,7 @@ app.get("/jobseeker", async (req, res) => {
 //getJobPosts for jobSeekers
 app.get("/getJobPosts", async (req, res) => {
   const jobPosts = await Job.findAll();
-  console.log(jobPosts);
+  //console.log(jobPosts);
   res.render("getJobPosts", { items: jobPosts });
 });
 
@@ -131,9 +133,78 @@ app.get("/job-post/:id", async (req, res) => {
       return;
     }
 
-    res.render("jobPostDetail", { job });
+    let successMessage = req.flash("applicationSuccessMessage")[0] || "";
+    let errorMessage = req.flash("applicationErrorMessage")[0] || "";
+
+    res.render("jobPostDetail", {
+      job,
+      applicationSuccessMessage: successMessage || null,
+      applicationErrorMessage: errorMessage || null,
+    });
   } catch (error) {
     console.error("Error fetching job post:", error);
+    res.status(500).send("Error fetching job post");
+  }
+});
+
+app.get("/send-cv/:id", async (req, res) => {
+  let userId = req.session.currentUserId;
+  let currentUser = await User.findOne({
+    where: {
+      id: userId,
+    },
+    include: [JobSeeker],
+  });
+
+  let application = {
+    JobId: Number(req.params.id),
+    JobSeekerId: Number(currentUser.JobSeeker.id),
+    applicationDate: Date.now(),
+    statusOfApplication: "Pending",
+  };
+
+  try {
+    let applicationExists = await Application.findOne({
+      where: {
+        [Op.and]: [
+          { JobSeekerId: application.JobSeekerId },
+          { JobId: application.JobId },
+        ],
+      },
+    });
+
+    if (applicationExists) {
+      console.log(
+        `application exists for JobSeekerId: ${application.JobSeekerId} and JobId: ${application.JobId}`
+      );
+      req.flash(
+        "applicationErrorMessage",
+        "You have already applied to this job"
+      );
+      res.redirect(`/job-post/${application.JobId}`);
+    } else {
+      console.log(
+        `application doesn't exist for JobSeekerId: ${application.JobSeekerId} and JobId: ${application.JobId}`
+      );
+      let savedApplication = await Application.create(application);
+      console.log(
+        `Application have been successfully created : ${JSON.stringify(
+          application,
+          null,
+          2
+        )}`
+      );
+      req.flash(
+        "applicationSuccessMessage",
+        "Your appliction have been successfully submitted"
+      );
+      res.redirect(`/job-post/${application.JobId}`);
+    }
+  } catch (error) {
+    console.error(
+      `Error creating new application for jobId: ${application.JobId}`,
+      error
+    );
     res.status(500).send("Error fetching job post");
   }
 });
@@ -250,7 +321,9 @@ app.post("/login", async (req, res) => {
   console.log(`Printed the value of validUser done.........`);
   if (validUser) {
     //login success redirect to home_jobseeker
-    console.log(`User with email: ${email} and password: ${password} have been found.`);
+    console.log(
+      `User with email: ${email} and password: ${password} have been found.`
+    );
     req.session.currentUserId = validUser.id;
     if (validUser.userType === "jobseeker") {
       console.log("redirecting to '/jobseeker'");
@@ -263,7 +336,8 @@ app.post("/login", async (req, res) => {
     //give error message
     req.flash("loginErrorMessage", "");
     req.flash(
-      "loginErrorMessage", `User with Email: ${email} and Password: ${password} have not been found`
+      "loginErrorMessage",
+      `User with Email: ${email} and Password: ${password} have not been found`
     );
     res.redirect("/login");
   }
@@ -353,10 +427,9 @@ app.post("/registerJobSeeker", upload.single("cv"), async (req, res) => {
     res.redirect("login");
   }
 });
-
 // #endregion
 
-// #region RegisterPage for Agency
+// #region Register Page for Agency
 app.get("/registerAgency", (req, res) => {
   let initialFormData = {
     userType: "agency",
@@ -483,7 +556,6 @@ app.get("/jobSeekerProfile", async (req, res) => {
 });
 
 // Recruitment Agency Profile Route
-// Recruitment Agency Profile Route
 app.get("/agencyProfile", async (req, res) => {
   try {
     // Assuming you have a way to retrieve the current user's ID from the session
@@ -559,8 +631,6 @@ app.post("/post-job", async (req, res) => {
 });
 
 //#endregion
-
-// #region test routes to check all the data is coming from the database correctly
 
 // Route to get all agencies
 app.get("/agencies", async (req, res) => {
@@ -641,9 +711,6 @@ app.get("/applications", async (req, res) => {
     res.status(500).send("Error retrieving applications");
   }
 });
-
-// #endregion
-// #region to update data
 
 // Server-side route to handle profile updates for job seekers
 app.post("/edit-profile", async (req, res) => {

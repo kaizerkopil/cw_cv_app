@@ -2,10 +2,22 @@
 <main class="container mt-5">
   <div class="row justify-content-center">    
     <div class="col-md-8">
+      <% if (applicationSuccessMessage) { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          <%= applicationSuccessMessage %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+      <% if (applicationErrorMessage) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <%= applicationErrorMessage %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
       <h1 class="mb-4"><%= job.title %> - <%= job.companyName %></h1>
       <p><strong>Pay:</strong> <%= job.pay %></p>
       <p><strong>Description:</strong> <%= job.description %></p>
-      <a href="/send-cv" class="btn btn-primary">Send CV</a>
+      <a href="/send-cv/<%= job.id %>" class="btn btn-primary">Send CV</a>
     </div>
   </div>
 </main>
