@@ -144,7 +144,7 @@ app.get("/contactUs", (req, res) => {
   res.render("contactUs");
 });
 
-// #region registerUser Page
+// #region [NOT BEING USED] registerUser Page
 let cust = {
   name: "",
   age: "",
@@ -222,7 +222,6 @@ app.post(
     }
   }
 );
-
 // #endregion registerUser Page
 
 //login Page
@@ -270,8 +269,7 @@ app.post("/login", async (req, res) => {
     //give error message
     req.flash("loginErrorMessage", "");
     req.flash(
-      "loginErrorMessage",
-      666676`User with emai: ${email} and  password: ${password} have not been found`
+      "loginErrorMessage", `User with emai: ${email} and  password: ${password} have not been found`
     );
     res.redirect("login");
   }
