@@ -16,7 +16,7 @@
         <% items.forEach(item => { %>
           <li class="list-group-item border-1 rounded-2">
             <div class="d-flex flex-column gap-2">
-              <div class="d-flex flex-row align-items-center gap-2 border-bottom pb-2"><img src="/img/jobseeker.png" alt="jobseeker image" width="50" height="50"><div class="h4"><%= item.JobSeeker.name %></div>
+              <div class="d-flex flex-row align-items-center gap-2 border-bottom pb-2"><img src="/img/jobseeker.png" alt="jobseeker image" width="50" height="50"><div class="h4 bg-secondary-subtle p-1 rounded-2"><%= item.JobSeeker.name %></div>
             </div>
               <div>Location: <strong><%= item.JobSeeker.location %></strong></div>
               <div>Occupation: <strong><%= item.JobSeeker.occupation %></strong></div>
