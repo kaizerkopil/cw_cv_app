@@ -1,31 +1,44 @@
 <%- include('./layouts/header_agency') %>
-<main class="container mt-5">
-  <div class="row justify-content-center">    
-    <div class="col-md-8">
-      <h1 class="mb-4">All Job Seekers</h1>
-      <!-- Search Form -->
-      <form action="/searchJobSeekers" method="GET" class="mb-4">
-        <div class="input-group">
-          <input type="text" name="keyword" class="form-control" placeholder="Search for job seekers...">
-          <button type="submit" class="btn btn-primary">Search</button>
-        </div>
-      </form>
-      
-      <!-- Job Posts List -->
-      <ul class="list-group gap-2">
-        <% items.forEach(item => { %>
-          <li class="list-group-item border-1 rounded-2">
-            <div class="d-flex flex-column gap-2">
-              <div class="d-flex flex-row align-items-center gap-2 border-bottom pb-2"><img src="/img/jobseeker.png" alt="jobseeker image" width="50" height="50"><div class="h4 bg-secondary-subtle p-1 rounded-2"><%= item.JobSeeker.name %></div>
-            </div>
-              <div>Location: <strong><%= item.JobSeeker.location %></strong></div>
-              <div>Occupation: <strong><%= item.JobSeeker.occupation %></strong></div>
-              <div>Email: <strong><%= item.email %></strong></div>
-            </div>
-          </li>
-        <% }) %>
-      </ul>
+  <main class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <h1 class="mb-4">All Job Seekers</h1>
+        <!-- Search Form -->
+        <form action="/searchJobSeekers" method="GET" class="mb-4">
+          <div class="input-group">
+            <input type="text" name="keyword" class="form-control" placeholder="Search for job seekers...">
+            <button type="submit" class="btn btn-primary">Search</button>
+          </div>
+        </form>
+
+        <!-- Job Posts List -->
+        <ul class="list-group gap-2">
+          <% items.forEach(item=> { %>
+            <li class="list-group-item border-1 rounded-2">
+              <div class="d-flex flex-column gap-2">
+                <div class="d-flex flex-row align-items-center gap-2 border-bottom pb-2"><img src="/img/jobseeker.png"
+                    alt="jobseeker image" width="50" height="50">
+                  <div class="h4 bg-secondary-subtle p-1 rounded-2">
+                    <%= item.JobSeeker.name %>
+                  </div>
+                </div>
+                <div>Email: <strong>
+                    <%= item.email %>
+                  </strong></div>
+                <div>Location: <strong>
+                    <%= item.JobSeeker.skills %>
+                  </strong></div>
+                <div>Location: <strong>
+                    <%= item.JobSeeker.location %>
+                  </strong></div>
+                <div>Occupation: <strong>
+                    <%= item.JobSeeker.occupation %>
+                  </strong></div>
+              </div>
+            </li>
+            <% }) %>
+        </ul>
+      </div>
     </div>
-  </div>
-</main>
-<%- include('./layouts/footer') %>
+  </main>
+  <%- include('./layouts/footer') %>
