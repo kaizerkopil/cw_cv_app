@@ -856,6 +856,10 @@ app.get("/jobSeekerApplications", async (req, res) => {
         },
         {
           model: Job,
+          include : {
+            model : Agency,
+            include : User
+          },
           attributes: [
             "id",
             "title",
