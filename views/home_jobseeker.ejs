@@ -11,8 +11,21 @@
       <p>Location: <span class="fw-semibold"><%= item.JobSeeker.location %></span></p>
     </div>
   </div>
-    <div class="container bg-danger h-25 w-100">
-      <label> hello </label>
+    <div class="container h-25 w-100">
+      <div class="col-md-8">
+        <h1 class="mb-4">Best Matches Jobs</h1>
+        <% if (jobPosts.length === 0) { %>
+          <p>There are no best job matches for you at the moment.</p>
+        <% } else { %>
+          <ul class="list-group">
+            <% jobPosts.forEach(item => { %>
+              <li class="list-group-item">
+                <a href="/job-post/<%= item.id %>"><%= item.title %> - <%= item.companyName %></a>
+              </li>
+            <% }) %>
+          </ul>
+        <% } %>
+      </div>      
     </div>
 </main>
 <%- include('./layouts/footer.ejs') %>

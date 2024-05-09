@@ -3,6 +3,15 @@
   <div class="row justify-content-center">    
     <div class="col-md-8">
       <h1 class="mb-4">All Job Posts</h1>
+      <!-- Search Form -->
+      <form action="/searchJobPosts" method="GET" class="mb-4">
+        <div class="input-group">
+          <input type="text" name="keyword" class="form-control" placeholder="Search for job posts...">
+          <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+      </form>
+      
+      <!-- Job Posts List -->
       <ul class="list-group">
         <% items.forEach(item => { %>
           <li class="list-group-item">

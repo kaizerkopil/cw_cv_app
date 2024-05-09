@@ -104,7 +104,21 @@ app.get("/jobseeker", async (req, res) => {
   if (req.session.currentUserId) {
     currentUserId = req.session.currentUserId;
   }
-  console.log(`jobseeker logged in with id: ${currentUserId}`);
+
+  // Fetch the user record along with their associated skills
+  const currentUser = await User.findByPk(currentUserId, {
+    include: [JobSeeker], // Assuming JobSeeker is associated with skills
+  });
+
+  // Extract the skills from the currentUser object
+  const currentUserSkills = currentUser.JobSeeker.skills;
+
+  // Fetch job posts from the database where skillsRequired match the user's skills
+  const jobPosts = await Job.findAll({
+    where: {
+      skillsRequired: currentUserSkills,
+    },
+  });
 
   let getUser = await User.findOne({
     where: {
@@ -113,7 +127,25 @@ app.get("/jobseeker", async (req, res) => {
     include: [JobSeeker],
   });
 
-  res.render("home_jobseeker", { item: getUser });
+  res.render("home_jobseeker", { item: getUser, jobPosts });
+});
+
+// Route to handle job search
+app.get("/searchJobPosts", async (req, res) => {
+  try {
+    const keyword = req.query.keyword; // Get the keyword from the query parameters
+    const jobPosts = await Job.findAll({
+      where: {
+        title: {
+          [Op.like]: `%${keyword}%`, // Use like operator to search for partial matches
+        },
+      },
+    });
+    res.render("getJobPosts", { items: jobPosts }); // Render the view with filtered job posts
+  } catch (error) {
+    console.error("Error searching job posts:", error);
+    res.status(500).send("Error searching job posts");
+  }
 });
 
 //getJobPosts for jobSeekers
@@ -678,7 +710,6 @@ app.get("/jobs", async (req, res) => {
 app.get("/applications", async (req, res) => {
   try {
     // Assuming you have access to the current agency's ID
-    console.log(`req.session.currentUserId: ${req.session.currentUserId}`);
     const agencyId = req.session.currentUserId;
 
     const applications = await Application.findAll({
@@ -737,7 +768,9 @@ app.post("/accept-application/:jobId/:jobSeekerId", async (req, res) => {
       }
     );
 
-    console.log(`Number of rows affected after updating application status to "Accepted": ${result}`);
+    console.log(
+      `Number of rows affected after updating application status to "Accepted": ${result}`
+    );
     res.redirect("/applications");
   } catch (error) {
     console.log(`error accepting application by Agency: ${error}`);
@@ -765,7 +798,9 @@ app.post("/reject-application/:jobId/:jobSeekerId", async (req, res) => {
         },
       }
     );
-    console.log(`Number of rows affected after updating application status to "Rejected": ${result}`);
+    console.log(
+      `Number of rows affected after updating application status to "Rejected": ${result}`
+    );
     res.redirect("/applications");
   } catch (error) {
     console.log(`Error rejecting application by Agency: ${error}`);
@@ -813,25 +848,29 @@ app.post("/edit-profile-agency", async (req, res) => {
 
 // Define a route to handle the POST request for editing job posts
 app.post("/edit-job/:jobId", async (req, res) => {
-  const jobId = req.params.id;
+  const jobId = req.params.jobId; // Use jobId instead of id
 
   try {
-    // Find the job by ID and delete it
-    const deletedJob = await Job.destroy({
-      where: { id: jobId },
-    });
+    // Extract updated job details from the request body
+    const { title, pay, jobLocation, skillsRequired, description } = req.body;
 
-    // Check if the job was successfully deleted
-    if (deletedJob) {
-      req.flash("successMessage", "Job deleted successfully");
-      res.status(200).send("Job deleted successfully");
+    // Find the job by ID and update its details
+    const updatedJob = await Job.update(
+      { title, pay, jobLocation, skillsRequired, description },
+      { where: { id: jobId } }
+    );
+
+    // Check if any rows were affected (job updated)
+    if (updatedJob[0] === 1) {
+      req.flash("successMessage", "Job updated successfully");
+      res.redirect("/agencyProfile"); // Redirect to the appropriate page
     } else {
       req.flash("errorMessage", "Job not found");
       res.status(404).send("Job not found");
     }
   } catch (error) {
-    console.error("Error deleting job:", error);
-    req.flash("errorMessage", "Error deleting job");
+    console.error("Error updating job:", error);
+    req.flash("errorMessage", "Error updating job");
     res.status(500).send("Internal Server Error");
   }
 });
