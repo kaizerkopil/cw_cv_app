@@ -85,6 +85,14 @@ app.get("/agency", async (req, res) => {
   if (req.session.currentUserId) {
     currentUserId = req.session.currentUserId;
   }
+  // get the userId from the session
+  const userId = req.session.currentUserId;
+  //fetch agency object from the database with the userId
+  const agencyObj = await Agency.findOne({
+    where: {
+      UserId: userId,
+    },
+  });
   const applications = await Application.findAll({
     include: [
       {
@@ -101,7 +109,7 @@ app.get("/agency", async (req, res) => {
       },
       {
         model: Job,
-        where: { AgencyId: currentUserId }, // Filter jobs by agencyId
+        where: { AgencyId: agencyObj.id }, // Filter jobs by agencyId
         attributes: [
           "id",
           "title",
@@ -584,20 +592,20 @@ app.post("/registerAgency", upload.none(), async (req, res) => {
 
 //Get all the jobseekers
 app.get("/getJobSeekers", async (req, res) => {
-  try{
-  const users = await User.findAll({
-    where : {
-      userType : 'jobseeker'
-    },
-    include : [JobSeeker]
-  });
+  try {
+    const users = await User.findAll({
+      where: {
+        userType: "jobseeker",
+      },
+      include: [JobSeeker],
+    });
 
-  console.log(`users: ${JSON.stringify(users, null, 2)}`);
-  res.render("getJobSeekers", { items: users });
-}catch(error){
-  console.error("Error fetching all job seekers:", error);
+    console.log(`users: ${JSON.stringify(users, null, 2)}`);
+    res.render("getJobSeekers", { items: users });
+  } catch (error) {
+    console.error("Error fetching all job seekers:", error);
     res.status(500).send("Error fetching all job seekers");
-}
+  }
 });
 
 // Route to handle jobSeeker search
@@ -606,16 +614,16 @@ app.get("/searchJobSeekers", async (req, res) => {
     const keyword = req.query.keyword; // Get the keyword from the query parameters
     const jobSeekers = await User.findAll({
       where: {
-       userType : "jobseeker"
+        userType: "jobseeker",
       },
-      include : {
-        model : JobSeeker,
-        where : {
-          name : {
-            [Op.like]: `%${keyword}%`
-          }
-        }
-      }
+      include: {
+        model: JobSeeker,
+        where: {
+          name: {
+            [Op.like]: `%${keyword}%`,
+          },
+        },
+      },
     });
     res.render("getJobSeekers", { items: jobSeekers }); // Render the view with filtered job posts
   } catch (error) {
@@ -648,7 +656,7 @@ app.get("/jobSeekerProfile", async (req, res) => {
 
     if (getUser) {
       // User found, render the page with user data
-      res.render("jobSeekerProfile", { user: getUser, successMessage : msg });
+      res.render("jobSeekerProfile", { user: getUser, successMessage: msg });
     } else {
       // User not found, handle the error or redirect to an error page
       res.status(404).send("User not found");
@@ -779,9 +787,14 @@ app.get("/jobs", async (req, res) => {
 // Route to get all applications
 app.get("/applications", async (req, res) => {
   try {
-    // Assuming you have access to the current agency's ID
-    const agencyId = req.session.currentUserId;
-
+    // get the userId from the session
+    const userId = req.session.currentUserId;
+    //fetch agency object from the database with the userId
+    const agencyObj = await Agency.findOne({
+      where: {
+        UserId: userId,
+      },
+    });
     const applications = await Application.findAll({
       include: [
         {
@@ -798,7 +811,7 @@ app.get("/applications", async (req, res) => {
         },
         {
           model: Job,
-          where: { AgencyId: agencyId }, // Filter jobs by agencyId
+          where: { AgencyId: agencyObj.id }, // Filter jobs by agencyId
           attributes: [
             "id",
             "title",
