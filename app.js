@@ -627,12 +627,12 @@ app.get("/searchJobSeekers", async (req, res) => {
 // Get request for Job post page
 app.get("/uploadJobPost", async (req, res) => {
   const successMessage = req.flash("successMessage")[0]; // Get the first success message if it exists
-
   res.render("uploadJobPost", { successMessage: successMessage || null });
 });
 
 // Profile Page for job seekers
 app.get("/jobSeekerProfile", async (req, res) => {
+  let msg = req.flash("successMessage")[0];
   if (req.session.currentUserId) {
     currentUserId = req.session.currentUserId;
   }
@@ -648,7 +648,7 @@ app.get("/jobSeekerProfile", async (req, res) => {
 
     if (getUser) {
       // User found, render the page with user data
-      res.render("jobSeekerProfile", { user: getUser });
+      res.render("jobSeekerProfile", { user: getUser, successMessage : msg });
     } else {
       // User not found, handle the error or redirect to an error page
       res.status(404).send("User not found");
@@ -935,7 +935,7 @@ app.post("/edit-profile", async (req, res) => {
       { name, location, occupation, skills },
       { where: { UserId: userId } }
     );
-
+    req.flash("successMessage", "Your profile has been successfully updated");
     res.redirect("/jobSeekerProfile"); // Redirect to the profile page after editing
   } catch (error) {
     console.error("Error updating profile:", error);
