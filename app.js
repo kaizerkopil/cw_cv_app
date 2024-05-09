@@ -85,7 +85,36 @@ app.get("/agency", async (req, res) => {
   if (req.session.currentUserId) {
     currentUserId = req.session.currentUserId;
   }
-  console.log(`agency logged in with id: ${currentUserId}`);
+  const applications = await Application.findAll({
+    include: [
+      {
+        model: JobSeeker,
+        attributes: [
+          "id",
+          "name",
+          "location",
+          "occupation",
+          "skills",
+          "cv",
+          "UserId",
+        ],
+      },
+      {
+        model: Job,
+        where: { AgencyId: currentUserId }, // Filter jobs by agencyId
+        attributes: [
+          "id",
+          "title",
+          "pay",
+          "companyName",
+          "jobLocation",
+          "skillsRequired",
+          "description",
+          "AgencyId",
+        ],
+      },
+    ],
+  });
 
   let getUser = await User.findOne({
     where: {
@@ -94,8 +123,7 @@ app.get("/agency", async (req, res) => {
     include: [Agency],
   });
 
-  console.log(`fetchedAgency: ${JSON.stringify(getUser, null, 2)}`);
-  res.render("home_agency", { item: getUser });
+  res.render("home_agency", { item: getUser, applications });
 });
 
 //jobseeker home page route
@@ -734,6 +762,8 @@ app.get("/applications", async (req, res) => {
             "title",
             "pay",
             "companyName",
+            "jobLocation",
+            "skillsRequired",
             "description",
             "AgencyId",
           ],
@@ -742,6 +772,50 @@ app.get("/applications", async (req, res) => {
     });
 
     res.render("applications", { applications });
+  } catch (error) {
+    console.log("Error retrieving applications: " + error);
+    res.status(500).send("Error retrieving applications");
+  }
+});
+
+// Route to get all applications for Job Seekers
+app.get("/jobSeekerApplications", async (req, res) => {
+  try {
+    // Assuming you have access to the current agency's ID
+    const userID = req.session.currentUserId;
+
+    const applications = await Application.findAll({
+      include: [
+        {
+          model: JobSeeker,
+          where: { UserId: userID }, // Filter jobs by agencyId
+          attributes: [
+            "id",
+            "name",
+            "location",
+            "occupation",
+            "skills",
+            "cv",
+            "UserId",
+          ],
+        },
+        {
+          model: Job,
+          attributes: [
+            "id",
+            "title",
+            "pay",
+            "companyName",
+            "jobLocation",
+            "skillsRequired",
+            "description",
+            "AgencyId",
+          ],
+        },
+      ],
+    });
+
+    res.render("jobSeekerApplications", { applications });
   } catch (error) {
     console.log("Error retrieving applications: " + error);
     res.status(500).send("Error retrieving applications");

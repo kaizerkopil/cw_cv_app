@@ -10,8 +10,65 @@
       <p>Location: <span class="fw-semibold"><%= item.Agency.location %></span></p>
     </div>
   </div>
-  <div class="container bg-danger h-25 w-100">
-    <label> hello </label>
+  <div class="container h-25 w-100">
+    <div class="container mt-2">
+      <div class="row justify-content-center">
+        <div class="col-md-10">
+          <h1 class="mb-3">New Applications</h1>
+          <% if (applications.some(application => application.statusOfApplication === 'Pending')) { %> <!-- Check if there are pending applications -->
+            <ul class="list-group gap-3">
+              <% for(let i = 0; i < applications.length; i++){ %>
+                <% if(applications[i].statusOfApplication === 'Pending'){ %> <!-- Only show applications with status "Pending" -->
+                  <li class="list-group-item rounded-2 border-2">
+                    <!-- Application details -->
+                    <div class="container">
+                      <div class="d-flex fw-semibold border-bottom p-2 bg-secondary-subtle align-items-center gap-2 justify-content-between mb-1 rounded-2">
+                        <span class="fs-4">Application # <%= i %></span>
+                        <span class="fs-6"><strong>Status: </strong> <%= applications[i].statusOfApplication %></span>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-6">
+                          <h4 class="lead">Applicant details: </h4>
+                          <!-- Applicant details -->
+                          <h5>Name: <%= applications[i].JobSeeker.name %></h5>
+                          <p><strong>Location:</strong> <%= applications[i].JobSeeker.location %></p>
+                          <p><strong>Occupation:</strong> <%= applications[i].JobSeeker.occupation %></p>
+                          <p><strong>Skills:</strong> <%= applications[i].JobSeeker.skills %></p>
+                          <p><strong>CV:</strong> <%= applications[i].JobSeeker.cv %></p>
+                        </div>
+                        <div class="col-md-6">
+                          <h4 class="lead">Job details: </h4>
+                          <!-- Job details -->
+                          <h5>Title: <%= applications[i].Job.title %></h5>
+                          <p><strong>Salary:</strong> <%= applications[i].Job.pay %></p>
+                          <p><strong>Company:</strong> <%= applications[i].Job.companyName %></p>
+                          <p><strong>Job Location:</strong> <%= applications[i].Job.jobLocation %></p>
+                          <p><strong>Skills Required:</strong> <%= applications[i].Job.skillsRequired %></p>
+                          <p><strong>Description:</strong> <%= applications[i].Job.description %></p>
+                        </div>
+                      </div>
+                      <!-- Action buttons -->
+                      <div class="d-flex gap-2">
+                        <form action="/accept-application/<%= applications[i].JobId %>/<%= applications[i].JobSeekerId %>" method="POST">
+                          <button type="submit" class="btn btn-success">Accept</button>
+                        </form>
+                        <form action="/reject-application/<%= applications[i].JobId %>/<%= applications[i].JobSeekerId %>" method="POST">
+                          <button type="submit" class="btn btn-danger">Reject</button>
+                        </form>
+                      </div>
+                    </div>        
+                  </li>
+                <% } %>
+              <% } %>
+            </ul>
+          <% } else { %>
+            <div class="alert alert-info" role="alert">
+              No new applications.
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
   </div>
 </main>
 <%- include('./layouts/footer.ejs') %>
