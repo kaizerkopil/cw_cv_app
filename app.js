@@ -584,10 +584,45 @@ app.post("/registerAgency", upload.none(), async (req, res) => {
 
 //Get all the jobseekers
 app.get("/getJobSeekers", async (req, res) => {
-  const jobSeekers = await JobSeeker.findAll();
-  res.render("getJobSeekers", { item: jobSeekers});
+  try{
+  const users = await User.findAll({
+    where : {
+      userType : 'jobseeker'
+    },
+    include : [JobSeeker]
+  });
+
+  console.log(`users: ${JSON.stringify(users, null, 2)}`);
+  res.render("getJobSeekers", { items: users });
+}catch(error){
+  console.error("Error fetching all job seekers:", error);
+    res.status(500).send("Error fetching all job seekers");
+}
 });
 
+// Route to handle jobSeeker search
+app.get("/searchJobSeekers", async (req, res) => {
+  try {
+    const keyword = req.query.keyword; // Get the keyword from the query parameters
+    const jobSeekers = await User.findAll({
+      where: {
+       userType : "jobseeker"
+      },
+      include : {
+        model : JobSeeker,
+        where : {
+          name : {
+            [Op.like]: `%${keyword}%`
+          }
+        }
+      }
+    });
+    res.render("getJobSeekers", { items: jobSeekers }); // Render the view with filtered job posts
+  } catch (error) {
+    console.error("Error searching job seekers:", error);
+    res.status(500).send("Error searching job seekers");
+  }
+});
 
 // Get request for Job post page
 app.get("/uploadJobPost", async (req, res) => {
