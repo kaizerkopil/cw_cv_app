@@ -1,25 +1,46 @@
-//user.test.js
-const {User} = require('../models/user')
+const user = require('../models/testModels/tstUser.js');
+const error = require('../utils/AppValidationError.js');
 
-describe('calculateAge', () =>{
-    test('calculates the correct age based on the birth year', 
-    () => {
+describe('createUser', () =>{
+    test('ALL PARAMETERS PASSED VALID, Should return true', () => {
         //Arrange
-        const birthYear = 1990;
-        const expectedAge = new Date().getFullYear() - birthYear;
-
+        let email = 'jackson@gmail.com';
+        let password = '12345';
+        let userType = 'JobSeeler';
+     
+        let expectedResult = true;
         //Act
-        const age = User.calculateAge(birthYear);
-
+        let actualResult = user.createUser(email, password, userType)
         //Assert
-        expect(age).toBe(expectedAge);
+        expect(actualResult).toBe(expectedResult);
     });
 
-    test('returns 0 when the current year is given as birth year', 
-    () => {
-        const currentYear = new Date().getFullYear();
-        const age = User.calculateAge(currentYear);
-        expect(age).toBe(0);
+    test('email is invalid it should throw AppValidation Error', () => {
+        let email = '';
+        let password = '12345';
+        let userType = 'INFO SOLUTIONS LIMITED';
+      
+        expect(() => user.createUser(email, password, userType)).toThrow(error.AppValidationError);
+        expect(() => user.createUser(email, password, userType)).toThrow("Invalid email");
     });
-});
 
+
+    test('password is invalid it should throw AppValidation Error', () => {
+        let email = 'user@gmail.com';
+        let password = '';
+        let userType = 'INFO SOLUTIONS LIMITED';
+      
+        expect(() => user.createUser(email, password, userType)).toThrow(error.AppValidationError);
+        expect(() => user.createUser(email, password, userType)).toThrow("Invalid password");
+    });
+
+    
+    test('userType is invalid it should throw AppValidation Error', () => {
+        let email = 'great@gmail.com';
+        let password = '12345';
+        let userType = '';
+      
+        expect(() => user.createUser(email, password, userType)).toThrow(error.AppValidationError);
+        expect(() => user.createUser(email, password, userType)).toThrow("Invalid userType");
+    });
+})

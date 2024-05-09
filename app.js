@@ -582,6 +582,13 @@ app.post("/registerAgency", upload.none(), async (req, res) => {
 });
 // #endregion
 
+//Get all the jobseekers
+app.get("/getJobSeekers", async (req, res) => {
+  const jobSeekers = await JobSeeker.findAll();
+  res.render("getJobSeekers", { item: jobSeekers});
+});
+
+
 // Get request for Job post page
 app.get("/uploadJobPost", async (req, res) => {
   const successMessage = req.flash("successMessage")[0]; // Get the first success message if it exists
