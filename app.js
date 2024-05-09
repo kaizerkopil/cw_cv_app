@@ -1,3 +1,8 @@
+/*
+  Assignment: Coursework 2
+  Module Code & Title: CI7260 Software Quality Engineering 
+  Developed by : Kopil Kaiser (K2360182) & Muhammad Haider (K2345541)
+*/
 //loading environment variables to be used across all the files in the project
 require("dotenv").config();
 
